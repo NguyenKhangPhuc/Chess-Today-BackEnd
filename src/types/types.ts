@@ -35,3 +35,7 @@ export interface TokenAttributes {
 export interface UserAuthInfoRequest extends Request {
     user: TokenAttributes
 }
+
+export interface Player {
+    socketId: string
+}
