@@ -63,6 +63,13 @@ export interface GameAttributes {
     updatedAt?: Date,
 }
 
+export interface MoveAttributes {
+    id?: number,
+    gameId: number,
+    player1Move: string,
+    player2Move: string,
+}
+
 enum INVITATION_STATUS {
     'pending',
     'accepted',

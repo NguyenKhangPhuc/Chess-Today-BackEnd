@@ -12,6 +12,7 @@ import { setUpSocket } from './sockets';
 import inviteRouter from './routes/invite';
 import friendshipRouter from './routes/friendship';
 import gameRouter from './routes/game';
+import moveRouter from './routes/move';
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -49,6 +50,7 @@ app.use('/api/login', loginRouter);
 app.use('/api/invite', inviteRouter);
 app.use('/api/friendship', friendshipRouter);
 app.use('/api/game', gameRouter);
+app.use('/api/move', moveRouter);
 
 
 export default server;
