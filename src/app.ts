@@ -10,6 +10,7 @@ import { Server } from 'socket.io';
 import http from 'http';
 import { setUpSocket } from './sockets';
 import inviteRouter from './routes/invite';
+import friendshipRouter from './routes/friendship';
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -45,7 +46,7 @@ app.use('/api/analyze', analyzeRouter);
 app.use('/api/sign-up', signUpRouter);
 app.use('/api/login', loginRouter);
 app.use('/api/invite', inviteRouter);
-
+app.use('/api/friendship', friendshipRouter);
 
 
 export default server;

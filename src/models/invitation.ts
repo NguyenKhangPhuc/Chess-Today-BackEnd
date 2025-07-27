@@ -1,9 +1,9 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { InvitationType } from "../types/types";
+import { InvitationAttributes } from "../types/types";
 
-type InvitationCreationAttributes = Optional<InvitationType, 'id' | 'status'>;
-class Invitation extends Model<InvitationType, InvitationCreationAttributes> { }
+type InvitationCreationAttributes = Optional<InvitationAttributes, 'id' | 'status'>;
+class Invitation extends Model<InvitationAttributes, InvitationCreationAttributes> { }
 Invitation.init({
     id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
     senderId: { type: DataTypes.INTEGER, references: { model: 'users', key: 'id' }, allowNull: false },

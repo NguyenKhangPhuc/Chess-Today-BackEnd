@@ -3,7 +3,6 @@ import { TokenAttributes, UserAttributes } from '../types/types';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../utils/config';
 import models from '../models';
-import Invitation from '../models/Invitation';
 const loginRouter = express.Router();
 
 loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res: Response) => {
@@ -40,8 +39,22 @@ loginRouter.get('/', async (_: Request, res: Response) => {
                 as: 'sentInvitations'
             },
             {
-                model: Invitation,
+                model: models.Invitation,
                 as: 'receivedInvitations'
+            },
+            {
+                model: models.User,
+                as: 'friends',
+                through: {
+                    attributes: []
+                }
+            },
+            {
+                model: models.User,
+                as: 'friendOf',
+                through: {
+                    attributes: []
+                }
             }
         ]
     });

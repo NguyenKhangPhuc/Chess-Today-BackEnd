@@ -40,11 +40,17 @@ export interface Player {
     socketId: string
 }
 
-export interface InvitationType {
+export interface InvitationAttributes {
     id?: string,
     senderId: string
     receiverId: string,
     status: INVITATION_STATUS
+}
+
+export interface FriendAttributes {
+    id?: string,
+    userId: string,
+    friendId: string,
 }
 
 enum INVITATION_STATUS {
