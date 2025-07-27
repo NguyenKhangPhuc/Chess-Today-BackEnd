@@ -41,16 +41,26 @@ export interface Player {
 }
 
 export interface InvitationAttributes {
-    id?: string,
+    id?: number,
     senderId: string
     receiverId: string,
     status: INVITATION_STATUS
 }
 
 export interface FriendAttributes {
-    id?: string,
+    id?: number,
     userId: string,
     friendId: string,
+}
+
+export interface GameAttributes {
+    id?: number,
+    player1Id: number,
+    player2Id: number,
+    winnerId: number,
+    endedAt?: Date,
+    createdAt?: Date,
+    updatedAt?: Date,
 }
 
 enum INVITATION_STATUS {

@@ -3,6 +3,7 @@ import { TokenAttributes, UserAttributes } from '../types/types';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../utils/config';
 import models from '../models';
+import Game from '../models/game';
 const loginRouter = express.Router();
 
 loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res: Response) => {
@@ -55,6 +56,14 @@ loginRouter.get('/', async (_: Request, res: Response) => {
                 through: {
                     attributes: []
                 }
+            },
+            {
+                model: Game,
+                as: 'gameAsPlayer1'
+            },
+            {
+                model: Game,
+                as: 'gameAsPlayer2'
             }
         ]
     });
