@@ -14,7 +14,7 @@ export interface University {
 }
 
 export interface UserAttributes {
-    id: number;
+    id?: number;
     name: string;
     username: string;
     email: string;
@@ -38,4 +38,17 @@ export interface UserAuthInfoRequest extends Request {
 
 export interface Player {
     socketId: string
+}
+
+export interface InvitationType {
+    id?: string,
+    senderId: string
+    receiverId: string,
+    status: INVITATION_STATUS
+}
+
+enum INVITATION_STATUS {
+    'pending',
+    'accepted',
+    'rejected'
 }

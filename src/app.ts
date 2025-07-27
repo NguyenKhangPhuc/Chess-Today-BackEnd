@@ -9,6 +9,7 @@ import loginRouter from './routes/login';
 import { Server } from 'socket.io';
 import http from 'http';
 import { setUpSocket } from './sockets';
+import inviteRouter from './routes/invite';
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -43,7 +44,7 @@ app.get('/ping', (_req, res) => {
 app.use('/api/analyze', analyzeRouter);
 app.use('/api/sign-up', signUpRouter);
 app.use('/api/login', loginRouter);
-
+app.use('/api/invite', inviteRouter);
 
 
 
