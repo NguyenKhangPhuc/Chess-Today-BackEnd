@@ -1,11 +1,16 @@
-import { DataTypes, QueryInterface } from "sequelize";
+import { DataTypes, QueryInterface, Sequelize } from "sequelize";
 
 
 export async function up({ context: queryInterface }: { context: QueryInterface }) {
     await queryInterface.createTable('friendships', {
-        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        user_id: { type: DataTypes.INTEGER, references: { model: 'users', key: 'id' }, allowNull: false },
-        friend_id: { type: DataTypes.INTEGER, references: { model: 'users', key: 'id' }, allowNull: false },
+        id: {
+            allowNull: false,
+            primaryKey: true,
+            type: DataTypes.UUID,
+            defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        },
+        user_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
+        friend_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
         created_at: { type: DataTypes.TIME },
         updated_at: { type: DataTypes.TIME }
     });

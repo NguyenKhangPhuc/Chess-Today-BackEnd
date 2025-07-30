@@ -5,9 +5,9 @@ import { FriendAttributes } from "../types/types";
 type FriendShipCreationAttributes = Optional<FriendAttributes, 'id'>;
 class FriendShip extends Model<FriendAttributes, FriendShipCreationAttributes> { }
 FriendShip.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-    userId: { type: DataTypes.INTEGER, references: { model: 'users', key: 'id' }, allowNull: false },
-    friendId: { type: DataTypes.INTEGER, references: { model: 'users', key: 'id' }, allowNull: false },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
+    userId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
+    friendId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
 
 }, {
     sequelize,

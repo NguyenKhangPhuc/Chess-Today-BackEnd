@@ -1,6 +1,6 @@
 import FriendShip from "./friendship";
 import Game from "./game";
-import Invitation from "./Invitation";
+import Invitation from "./invitation";
 import Move from "./move";
 import User from "./user";
 

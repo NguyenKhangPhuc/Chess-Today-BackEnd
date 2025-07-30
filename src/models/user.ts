@@ -3,10 +3,9 @@ import { sequelize } from "../utils/db";
 import { UserAttributes } from "../types/types";
 type UserCreationAttributes = Optional<UserAttributes, 'id' | 'createdAt' | 'status' | 'updatedAt' | 'onlineAt'>;
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
-    id!: number;
+    id!: string;
     name!: string;
     username!: string;
-    email!: string;
     password!: string;
     status!: boolean;
     onlineAt!: Date;
@@ -14,10 +13,10 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     updatedAt?: Date;
 }
 User.init({
-    id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
+    id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.TEXT, allowNull: false },
-    username: { type: DataTypes.TEXT, allowNull: false },
-    email: { type: DataTypes.TEXT, allowNull: false },
+    username: { type: DataTypes.TEXT, allowNull: false, validate: { isEmail: { msg: 'Username must be an email' } } },
+
     password: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.BOOLEAN, defaultValue: false },
     onlineAt: { type: DataTypes.TIME }

@@ -23,7 +23,6 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         id: foundUser.id,
         username: foundUser.username,
         name: foundUser.name,
-        email: foundUser.email,
     };
 
     const token = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '1h' });

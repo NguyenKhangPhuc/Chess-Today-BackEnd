@@ -1,10 +1,15 @@
-import { DataTypes, QueryInterface } from "sequelize";
+import { DataTypes, QueryInterface, Sequelize } from "sequelize";
 
 
 export async function up({ context: queryInterface }: { context: QueryInterface }) {
     await queryInterface.createTable('moves', {
-        id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
-        game_id: { type: DataTypes.INTEGER, references: { model: 'games', key: 'id' }, allowNull: false },
+        id: {
+            allowNull: false,
+            primaryKey: true,
+            type: DataTypes.UUID,
+            defaultValue: Sequelize.literal('uuid_generate_v4()'),
+        },
+        game_id: { type: DataTypes.UUID, references: { model: 'games', key: 'id' }, allowNull: false },
         player_1_move: { type: DataTypes.TEXT, allowNull: false },
         player_2_move: { type: DataTypes.TEXT, allowNull: false },
         created_at: { type: DataTypes.TIME },

@@ -1,23 +1,11 @@
 import { Request } from "express";
 
 
-export interface University {
-    id: string,
-    name: string,
-    city: string,
-    overview: string,
-    ranking: string,
-    tuition: string,
-    scholarship: string,
-    type: string,
-    website: string,
-}
 
 export interface UserAttributes {
-    id?: number;
+    id?: string;
     name: string;
     username: string;
-    email: string;
     password?: string;
     status?: boolean;
     onlineAt?: Date,
@@ -26,45 +14,45 @@ export interface UserAttributes {
 }
 
 export interface TokenAttributes {
-    id: number,
+    id: string,
     name: string,
     username: string,
-    email: string,
-}
-
-export interface UserAuthInfoRequest extends Request {
-    user: TokenAttributes
 }
 
 export interface Player {
-    socketId: string
+    id: string
 }
 
 export interface InvitationAttributes {
-    id?: number,
+    id?: string,
     senderId: string
     receiverId: string,
     status: INVITATION_STATUS
 }
 
 export interface FriendAttributes {
-    id?: number,
+    id?: string,
     userId: string,
     friendId: string,
 }
 
+export interface UserRequest extends Request {
+    user: TokenAttributes;
+}
+
 export interface GameAttributes {
-    id?: number,
-    player1Id: number,
-    player2Id: number,
-    winnerId: number,
+    id?: string,
+    player1Id: string,
+    player2Id: string,
+    winnerId: string,
     endedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
+    fen?: string
 }
 
 export interface MoveAttributes {
-    id?: number,
+    id?: string,
     gameId: number,
     player1Move: string,
     player2Move: string,

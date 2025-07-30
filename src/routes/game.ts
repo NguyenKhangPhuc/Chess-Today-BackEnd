@@ -28,4 +28,18 @@ gameRouter.get('/', async (_: Request, res: Response) => {
     return;
 });
 
+
+gameRouter.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
+    const response = await Game.findByPk(req.params.id, {
+        include: [
+            {
+                model: Move,
+                as: 'moveHistory'
+            }
+        ]
+    });
+    res.json(response);
+    return;
+});
+
 export default gameRouter;

@@ -13,6 +13,8 @@ import inviteRouter from './routes/invite';
 import friendshipRouter from './routes/friendship';
 import gameRouter from './routes/game';
 import moveRouter from './routes/move';
+import { socketTokenExtractor } from './utils/middleware';
+import userRouter from './routes/user';
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -24,8 +26,13 @@ const io = new Server(server, {
         methods: ['GET', 'POST']
     }
 });
-
+// Wrap async middleware for socket.io
+// Wrap async socket middleware to handle errors properly
+io.use((socket, next) => {
+    Promise.resolve(socketTokenExtractor(socket, next)).catch(next);
+});
 setUpSocket(io);
+
 
 const start = async () => {
     try {
@@ -51,6 +58,7 @@ app.use('/api/invite', inviteRouter);
 app.use('/api/friendship', friendshipRouter);
 app.use('/api/game', gameRouter);
 app.use('/api/move', moveRouter);
+app.use('/api/user', userRouter);
 
 
 export default server;
