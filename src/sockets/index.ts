@@ -48,15 +48,13 @@ export const setUpSocket = (io: Server) => {
         socket.on('board_state_change', async ({ opponentId, roomId, fen }: { opponentId: string, roomId: string, fen: string }) => {
             await Game.update({ fen: fen }, { where: { id: roomId } });
             const opponentSocketId = userIdToSocketIdMap.get(opponentId);
-
             if (!opponentSocketId) {
-                console.log('Cannot find opponent socket id');
+                console.log('Incorrect opponent');
                 return;
             }
             io.to(opponentSocketId).emit('board_state_change', fen);
 
         });
-
 
 
         const matchMaking = async (type: string) => {

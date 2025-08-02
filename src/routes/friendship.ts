@@ -7,9 +7,13 @@ const friendshipRouter = express.Router();
 
 friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, FriendAttributes>, res: Response) => {
     try {
-        const friendship = req.body;
-        console.log(req.user, 'user');
-        const response = await models.FriendShip.create(friendship);
+        const { friendId } = req.body;
+        if (!req.user) {
+            res.json({ error: 'Not authenticated' });
+            return;
+        }
+
+        const response = await models.FriendShip.create({ userId: req.user?.id, friendId });
         res.json(response);
         return;
     } catch (error) {

@@ -25,7 +25,7 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         name: foundUser.name,
     };
 
-    const token = jwt.sign(userForToken, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(userForToken, JWT_SECRET);
     res.json({ token: token });
     return;
 });
