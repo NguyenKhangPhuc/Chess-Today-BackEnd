@@ -13,8 +13,15 @@ declare module "express-serve-static-core" {
     }
 }
 
+declare module "socket.io" {
+    interface Socket {
+        user?: TokenAttributes;
+    }
+}
+
 export const tokenExtractor: RequestHandler = async (req, res, next) => {
     const token = req.headers.authorization;
+    console.log('This is token from REST', token);
     if (token && token.startsWith('Bearer ')) {
         const receivedToken = token.substring(7);
         const decodedToken = jwt.verify(receivedToken, JWT_SECRET) as TokenAttributes;
@@ -22,7 +29,7 @@ export const tokenExtractor: RequestHandler = async (req, res, next) => {
             const foundUser = await models.User.findByPk(decodedToken.id);
             if (foundUser) {
                 req.user = foundUser;
-                console.log(req);
+
             }
         } else {
             res.status(404).json({ error: 'invalid Token' });

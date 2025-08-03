@@ -3,7 +3,7 @@ import { Request } from "express";
 
 
 export interface UserAttributes {
-    id?: string;
+    id: string;
     name: string;
     username: string;
     password?: string;
@@ -11,6 +11,7 @@ export interface UserAttributes {
     onlineAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
+    elo: number
 }
 
 export interface TokenAttributes {

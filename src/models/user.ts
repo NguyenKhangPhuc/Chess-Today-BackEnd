@@ -11,12 +11,13 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     onlineAt!: Date;
     createdAt?: Date;
     updatedAt?: Date;
+    elo!: number;
 }
 User.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.TEXT, allowNull: false },
     username: { type: DataTypes.TEXT, allowNull: false, validate: { isEmail: { msg: 'Username must be an email' } } },
-
+    elo: { type: DataTypes.INTEGER, allowNull: false },
     password: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.BOOLEAN, defaultValue: false },
     onlineAt: { type: DataTypes.TIME }
