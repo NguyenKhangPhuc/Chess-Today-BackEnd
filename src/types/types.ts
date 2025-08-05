@@ -12,7 +12,11 @@ export interface UserAttributes {
     createdAt?: Date,
     updatedAt?: Date,
     elo: number
+    rocketElo: number,
+    blitzElo: number,
 }
+
+
 
 export interface TokenAttributes {
     id: string,
@@ -20,8 +24,10 @@ export interface TokenAttributes {
     username: string,
 }
 
-export interface Player {
-    id: string
+
+
+export interface Player extends UserAttributes {
+    time: number,
 }
 
 export interface InvitationAttributes {
@@ -54,6 +60,7 @@ export interface GameAttributes {
     player2LastMoveTime?: Date,
     player1TimeLeft: number,
     player2TimeLeft: number,
+    gameType: GAME_TYPE
 }
 
 export interface MoveAttributes {
@@ -67,4 +74,10 @@ enum INVITATION_STATUS {
     'pending',
     'accepted',
     'rejected'
+}
+
+export enum GAME_TYPE {
+    ROCKET = 'Rocket',
+    BLITZ = 'Blitz',
+    RAPID = 'Rapid',
 }

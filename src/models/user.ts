@@ -1,7 +1,7 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
 import { UserAttributes } from "../types/types";
-type UserCreationAttributes = Optional<UserAttributes, 'id' | 'createdAt' | 'status' | 'updatedAt' | 'onlineAt'>;
+type UserCreationAttributes = Optional<UserAttributes, 'id' | 'createdAt' | 'status' | 'updatedAt' | 'onlineAt' | 'rocketElo' | 'blitzElo'>;
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
     id!: string;
     name!: string;
@@ -12,12 +12,16 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     createdAt?: Date;
     updatedAt?: Date;
     elo!: number;
+    rocketElo!: number;
+    blitzElo!: number;
 }
 User.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.TEXT, allowNull: false },
     username: { type: DataTypes.TEXT, allowNull: false, validate: { isEmail: { msg: 'Username must be an email' } } },
     elo: { type: DataTypes.INTEGER, allowNull: false },
+    rocketElo: { type: DataTypes.INTEGER, allowNull: false },
+    blitzElo: { type: DataTypes.INTEGER, allowNull: false },
     password: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.BOOLEAN, defaultValue: false },
     onlineAt: { type: DataTypes.DATE }

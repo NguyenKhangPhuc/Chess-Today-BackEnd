@@ -1,12 +1,12 @@
 
-import User from "../models/user";
-import { UserAttributes } from "../types/types";
+
+import { Player } from "../types/types";
 
 
 class MatchMakingQueue {
-    public playerQueue: Array<UserAttributes> = [];
+    public playerQueue: Array<Player> = [];
 
-    public add(player: UserAttributes,) {
+    public add(player: Player) {
         const isExistedPlayer = this.playerQueue.find(e => e.id === player.id);
         if (isExistedPlayer) {
             return;
@@ -14,6 +14,7 @@ class MatchMakingQueue {
         console.log(player.elo);
         if (this.playerQueue.length === 0) {
             this.playerQueue.push(player);
+            console.log(this.playerQueue);
             return;
         }
         let startIndex = 0;
@@ -32,10 +33,10 @@ class MatchMakingQueue {
         }
         console.log('startIndex, endIndex', startIndex, endIndex);
         this.playerQueue.splice(startIndex, 0, player);
-
+        console.log(this.playerQueue);
     }
 
-    public remove(player: User) {
+    public remove(player: Player) {
         const index = this.playerQueue.findIndex((e) => e.id === player.id);
         if (index !== -1) {
             this.playerQueue.splice(index, 1);
@@ -43,7 +44,7 @@ class MatchMakingQueue {
 
     }
 
-    public findMatch(player: UserAttributes, delta: number, joinAt = Date.now()) {
+    public findMatch(player: Player, delta: number, joinAt = Date.now()) {
         const minElo = player.elo - delta;
         const maxElo = player.elo + delta;
         let startIndex = 0;
@@ -60,9 +61,9 @@ class MatchMakingQueue {
             }
         }
         let score: number = Infinity;
-        let bestMatch: UserAttributes | null = null;
+        let bestMatch: Player | null = null;
         console.log('start,end', startIndex, endIndex);
-        for (let i = startIndex; i < this.playerQueue.length && this.playerQueue[i].elo < maxElo; i++) {
+        for (let i = startIndex; i < this.playerQueue.length && this.playerQueue[i].elo < maxElo && this.playerQueue[i].time === player.time; i++) {
 
             const playerInQueue = this.playerQueue[i];
             if (playerInQueue.id === player.id) continue;

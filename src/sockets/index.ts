@@ -1,5 +1,5 @@
 import { Server, Socket } from "socket.io";
-import { TokenAttributes, UserAttributes } from "../types/types";
+import { GAME_TYPE, Player, TokenAttributes, UserAttributes } from "../types/types";
 import Game from "../models/game";
 import MatchMakingQueue from "../matchmaking";
 import Move from "../models/move";
@@ -7,8 +7,9 @@ import models from "../models";
 
 
 const userIdToSocketIdMap = new Map<string, string>();
-const queue = new MatchMakingQueue();
-
+const rapidQueue = new MatchMakingQueue();
+const blitzQueue = new MatchMakingQueue();
+const rocketQueue = new MatchMakingQueue();
 
 declare module "socket.io" {
     interface Socket {
@@ -28,28 +29,64 @@ export const setUpSocket = (io: Server) => {
             console.log('Client disconnected:', socket.id);
 
         });
-        socket.on('join_queue', async (type: string, player: UserAttributes) => {
+        socket.on('join_queue', async (type: string, user: UserAttributes, timeSetting: { title: string, value: number, mode: GAME_TYPE }) => {
+
+            const player: Player = { ...user, time: timeSetting.value };
             if (!socket.user) {
                 console.log('User not authenticated');
                 return;
             }
             console.log(`${socket.user?.id} join queue`);
             if (socket.user?.id != undefined) {
-                queue.add(player);
+                if (timeSetting.mode == GAME_TYPE.RAPID) {
+                    console.log('Rapid');
+                    rapidQueue.add(player);
+                } else if (timeSetting.mode == GAME_TYPE.BLITZ) {
+                    console.log('Blitz');
+                    blitzQueue.add(player);
+                } else {
+                    console.log('Rocket');
+                    rocketQueue.add(player);
+                }
+
             }
-            console.log(type);
-            const bestMatch = queue.findMatch(player, 10);
-            console.log(queue.playerQueue);
+            let bestMatch;
+            if (timeSetting.mode == GAME_TYPE.RAPID) {
+                bestMatch = rapidQueue.findMatch(player, 10);
+
+            } else if (timeSetting.mode == GAME_TYPE.BLITZ) {
+                bestMatch = blitzQueue.findMatch(player, 10);
+            } else {
+                bestMatch = rocketQueue.findMatch(player, 10);
+            }
+
             if (bestMatch) {
+                if (timeSetting.mode == GAME_TYPE.RAPID) {
+                    rapidQueue.remove(player);
+                    rapidQueue.remove(bestMatch);
+
+                } else if (timeSetting.mode == GAME_TYPE.BLITZ) {
+                    blitzQueue.remove(player);
+                    blitzQueue.remove(bestMatch);
+                } else {
+                    rocketQueue.remove(player);
+                    rocketQueue.remove(bestMatch);
+                }
+
                 const player_1_socketId = userIdToSocketIdMap.get(player.id);
                 const player_2_socketId = userIdToSocketIdMap.get(bestMatch.id);
                 if (!player_1_socketId || !player_2_socketId) {
                     console.log('One of the players is not connected');
                     return;
                 }
+                console.log(player.id);
+                console.log(bestMatch.id);
                 const response = await Game.create({
                     player1Id: player.id,
                     player2Id: bestMatch.id,
+                    player1TimeLeft: player.time,
+                    player2TimeLeft: bestMatch.time,
+                    gameType: timeSetting.mode
                 });
                 io.to(player_1_socketId).emit('match_found', { opponent: bestMatch, roomId: response.id, type });
                 io.to(player_2_socketId).emit('match_found', { opponent: player.id, roomId: response.id, type });
