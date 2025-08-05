@@ -11,9 +11,9 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
         player_1_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
         player_2_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
         winner_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' } },
-        ended_at: { type: DataTypes.TIME, },
-        created_at: { type: DataTypes.TIME },
-        updated_at: { type: DataTypes.TIME }
+        ended_at: { type: DataTypes.DATE, },
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE }
     });
 }
 

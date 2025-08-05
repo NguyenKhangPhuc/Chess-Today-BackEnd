@@ -20,7 +20,7 @@ User.init({
     elo: { type: DataTypes.INTEGER, allowNull: false },
     password: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.BOOLEAN, defaultValue: false },
-    onlineAt: { type: DataTypes.TIME }
+    onlineAt: { type: DataTypes.DATE }
 },
     {
         sequelize,

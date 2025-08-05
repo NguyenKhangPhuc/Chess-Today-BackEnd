@@ -11,8 +11,8 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
         receiver_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
         sender_id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
         status: { type: DataTypes.ENUM('pending', 'accepted', 'rejected'), defaultValue: 'pending' },
-        created_at: { type: DataTypes.TIME },
-        updated_at: { type: DataTypes.TIME }
+        created_at: { type: DataTypes.DATE },
+        updated_at: { type: DataTypes.DATE }
     });
 }
 

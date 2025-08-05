@@ -13,7 +13,7 @@ export async function up({ context: queryInterface }: { context: QueryInterface 
         password: { type: DataTypes.TEXT, allowNull: false },
         email: { type: DataTypes.TEXT, allowNull: false },
         status: { type: DataTypes.BOOLEAN },
-        online_at: { type: DataTypes.TIME },
+        online_at: { type: DataTypes.DATE },
         created_at: { type: DataTypes.DATE, allowNull: false },
         updated_at: { type: DataTypes.DATE, allowNull: false },
     });

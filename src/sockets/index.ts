@@ -2,6 +2,8 @@ import { Server, Socket } from "socket.io";
 import { TokenAttributes, UserAttributes } from "../types/types";
 import Game from "../models/game";
 import MatchMakingQueue from "../matchmaking";
+import Move from "../models/move";
+import models from "../models";
 
 
 const userIdToSocketIdMap = new Map<string, string>();
@@ -63,6 +65,53 @@ export const setUpSocket = (io: Server) => {
             }
             io.to(opponentSocketId).emit('board_state_change', fen);
 
+        });
+
+        socket.on('game_time_update', async ({ newLeftTime, gameId, opponentId }: { newLeftTime: number, gameId: string, opponentId: string }) => {
+            if (!socket.user) {
+                console.log('User not authenticated');
+                return;
+            }
+            const response = await Game.findByPk(gameId, {
+                include: [
+                    {
+                        model: Move,
+                        as: 'moveHistory'
+                    },
+                    {
+                        model: models.User,
+                        as: 'player1',
+                        attributes: { exclude: ['password'] }
+                    },
+                    {
+                        model: models.User,
+                        as: 'player2',
+                        attributes: { exclude: ['password'] }
+                    }
+                ]
+            });
+            if (!response) {
+                console.log('Game not found');
+                return;
+            }
+            const player_1_socketId = userIdToSocketIdMap.get(socket.user.id);
+            const player_2_socketId = userIdToSocketIdMap.get(opponentId);
+            if (!player_1_socketId || !player_2_socketId) {
+                console.log('One of the players is not connected');
+                return;
+            }
+            if (socket.user.id === response.player1Id) {
+                const newPlayer1LastMoveTime = new Date();
+                const result = await response.update({ player1TimeLeft: newLeftTime, player1LastMoveTime: newPlayer1LastMoveTime });
+
+                io.to(player_1_socketId).emit('game_time_update', result);
+                io.to(player_2_socketId).emit('game_time_update', result);
+            } else {
+                const newPlayer2LastMoveTime = new Date();
+                const result = await response.update({ player2TimeLeft: newLeftTime, player2LastMoveTime: newPlayer2LastMoveTime });
+                io.to(player_1_socketId).emit('game_time_update', result);
+                io.to(player_2_socketId).emit('game_time_update', result);
+            }
         });
 
     });

@@ -49,7 +49,11 @@ export interface GameAttributes {
     endedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
-    fen?: string
+    fen?: string,
+    player1LastMoveTime?: Date,
+    player2LastMoveTime?: Date,
+    player1TimeLeft: number,
+    player2TimeLeft: number,
 }
 
 export interface MoveAttributes {
