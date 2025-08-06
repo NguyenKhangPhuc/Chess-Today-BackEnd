@@ -51,7 +51,7 @@ export interface GameAttributes {
     id?: string,
     player1Id: string,
     player2Id: string,
-    winnerId: string,
+    winnerId?: string,
     endedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,
@@ -74,6 +74,15 @@ enum INVITATION_STATUS {
     'pending',
     'accepted',
     'rejected'
+}
+
+export interface GameMessageAttributes {
+    id: string,
+    gameId: string,
+    senderId: string,
+    content: string,
+    createdAt?: Date,
+    updatedAt?: Date
 }
 
 export enum GAME_TYPE {

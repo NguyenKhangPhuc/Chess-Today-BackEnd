@@ -151,5 +151,12 @@ export const setUpSocket = (io: Server) => {
             }
         });
 
+        socket.on('announce_new_message', (opponentId: string) => {
+            const opponentSocketId = userIdToSocketIdMap.get(opponentId);
+            if (opponentSocketId) {
+                io.to(opponentSocketId).emit('announce_new_message', 'new message from your opponent');
+            }
+        });
+
     });
 };

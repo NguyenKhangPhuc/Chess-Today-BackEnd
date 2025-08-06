@@ -1,5 +1,6 @@
 import FriendShip from "./friendship";
 import Game from "./game";
+import GameMessage from "./gameMessage";
 import Invitation from "./invitation";
 import Move from "./move";
 import User from "./user";
@@ -20,6 +21,8 @@ Game.belongsTo(User, { foreignKey: 'player2Id', as: 'player2' });
 Game.hasMany(Move, { foreignKey: 'gameId', as: 'moveHistory' });
 Move.belongsTo(Game, { foreignKey: 'gameId', as: 'game' });
 
+Game.hasMany(GameMessage, { foreignKey: 'gameId', as: 'gameMessages' });
+GameMessage.belongsTo(Game, { foreignKey: 'gameId', as: 'game' });
 export default {
     User,
     Invitation,

@@ -6,7 +6,7 @@ type GameCreationAttributes = Optional<GameAttributes,
     'id' | 'createdAt' | 'endedAt' | 'updatedAt' | 'winnerId' | 'fen' | 'player1LastMoveTime' |
     'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType'
 >;
-class Game extends Model<GameAttributes, GameCreationAttributes> {
+class Game extends Model<GameAttributes, GameCreationAttributes> implements GameAttributes {
     id!: string;
     player1Id!: string;
     player2Id!: string;
@@ -15,7 +15,11 @@ class Game extends Model<GameAttributes, GameCreationAttributes> {
     createdAt?: Date;
     updatedAt?: Date;
     fen?: string;
-    gameType?: GAME_TYPE;
+    gameType!: GAME_TYPE;
+    player1LastMoveTime?: Date | undefined;
+    player2LastMoveTime?: Date | undefined;
+    player1TimeLeft!: number;
+    player2TimeLeft!: number;
 }
 Game.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },

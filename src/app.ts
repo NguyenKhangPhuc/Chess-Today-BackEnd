@@ -15,6 +15,7 @@ import gameRouter from './routes/game';
 import moveRouter from './routes/move';
 import { socketTokenExtractor } from './utils/middleware';
 import userRouter from './routes/user';
+import gameMessageRouter from './routes/gameMessage';
 const app = express();
 const server = http.createServer(app);
 app.use(express.json());
@@ -59,6 +60,6 @@ app.use('/api/friendship', friendshipRouter);
 app.use('/api/game', gameRouter);
 app.use('/api/move', moveRouter);
 app.use('/api/user', userRouter);
-
+app.use('/api/game-messages', gameMessageRouter);
 
 export default server;
