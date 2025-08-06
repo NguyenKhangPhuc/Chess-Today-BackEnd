@@ -65,9 +65,16 @@ export interface GameAttributes {
 
 export interface MoveAttributes {
     id?: string,
-    gameId: number,
-    player1Move: string,
-    player2Move: string,
+    gameId: string,
+    before: string,
+    after: string,
+    color: string,
+    piece: string,
+    from: string,
+    to: string,
+    san: string,
+    lan: string,
+    moverId: string
 }
 
 enum INVITATION_STATUS {

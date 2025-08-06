@@ -20,6 +20,8 @@ Game.belongsTo(User, { foreignKey: 'player2Id', as: 'player2' });
 
 Game.hasMany(Move, { foreignKey: 'gameId', as: 'moveHistory' });
 Move.belongsTo(Game, { foreignKey: 'gameId', as: 'game' });
+User.hasMany(Move, { foreignKey: 'moverId', as: 'moves' });
+Move.belongsTo(User, { foreignKey: 'moverId', as: 'mover' });
 
 Game.hasMany(GameMessage, { foreignKey: 'gameId', as: 'gameMessages' });
 GameMessage.belongsTo(Game, { foreignKey: 'gameId', as: 'game' });

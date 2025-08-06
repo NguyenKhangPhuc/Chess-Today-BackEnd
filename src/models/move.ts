@@ -3,12 +3,31 @@ import { sequelize } from "../utils/db";
 import { MoveAttributes } from "../types/types";
 
 type MoveCreationAttributes = Optional<MoveAttributes, 'id'>;
-class Move extends Model<MoveAttributes, MoveCreationAttributes> { }
+class Move extends Model<MoveAttributes, MoveCreationAttributes> implements MoveAttributes {
+    id!: string;
+    gameId!: string;
+    before!: string;
+    after!: string;
+    color!: string;
+    piece!: string;
+    from!: string;
+    to!: string;
+    san!: string;
+    lan!: string;
+    moverId!: string;
+}
 Move.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     gameId: { type: DataTypes.UUID, references: { model: 'games', key: 'id' }, allowNull: false },
-    player1Move: { type: DataTypes.TEXT, allowNull: false, field: 'player_1_move' },
-    player2Move: { type: DataTypes.TEXT, allowNull: false, field: 'player_2_move' },
+    before: { type: DataTypes.TEXT, allowNull: false },
+    after: { type: DataTypes.TEXT, allowNull: false },
+    color: { type: DataTypes.TEXT, allowNull: false },
+    piece: { type: DataTypes.TEXT, allowNull: false },
+    from: { type: DataTypes.TEXT, allowNull: false },
+    to: { type: DataTypes.TEXT, allowNull: false },
+    san: { type: DataTypes.TEXT, allowNull: false },
+    lan: { type: DataTypes.TEXT, allowNull: false },
+    moverId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false }
 }, {
     sequelize,
     underscored: true,

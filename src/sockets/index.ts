@@ -94,13 +94,22 @@ export const setUpSocket = (io: Server) => {
         });
 
         socket.on('board_state_change', async ({ opponentId, roomId, fen }: { opponentId: string, roomId: string, fen: string }) => {
-            await Game.update({ fen: fen }, { where: { id: roomId } });
+            if (!socket.user) {
+                console.log('Not authenticated');
+                return;
+            }
             const opponentSocketId = userIdToSocketIdMap.get(opponentId);
             if (!opponentSocketId) {
                 console.log('Incorrect opponent');
                 return;
             }
-            io.to(opponentSocketId).emit('board_state_change', fen);
+            try {
+                await Game.update({ fen: fen }, { where: { id: roomId } });
+                io.to(opponentSocketId).emit('board_state_change', fen);
+            } catch (error) {
+                console.log(error);
+            }
+
 
         });
 
@@ -157,6 +166,8 @@ export const setUpSocket = (io: Server) => {
                 io.to(opponentSocketId).emit('announce_new_message', 'new message from your opponent');
             }
         });
+
+
 
     });
 };
