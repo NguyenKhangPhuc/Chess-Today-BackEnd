@@ -52,6 +52,8 @@ export interface GameAttributes {
     player1Id: string,
     player2Id: string,
     winnerId?: string,
+    loserId?: string,
+    isDraw: boolean
     endedAt?: Date,
     createdAt?: Date,
     updatedAt?: Date,

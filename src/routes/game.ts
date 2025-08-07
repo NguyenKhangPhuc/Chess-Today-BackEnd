@@ -93,4 +93,36 @@ gameRouter.put('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
     }
 });
 
+gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    if (!req.user) {
+        res.json({ error: 'Not authenticated' });
+        return;
+    }
+    const game = await Game.findByPk(req.params.id);
+    if (!game) {
+        res.json({ error: 'Game not found' });
+        return;
+    }
+    const response = await game.update({ isDraw: true });
+    res.json(response);
+    return;
+});
+
+gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id: string }, unknown, { winnerId: string, loserId: string }>, res: Response) => {
+    if (!req.user) {
+        res.json({ error: 'Not authenticated' });
+    }
+    const game = await Game.findByPk(req.params.id);
+    if (!game) {
+        res.json({ error: 'Game not found' });
+        return;
+    }
+    console.log('This is winner and loser', req.body.winnerId, req.body.loserId);
+
+    const response = await game.update({ winnerId: req.body.winnerId, loserId: req.body.loserId });
+    res.json(response);
+    return;
+
+});
+
 export default gameRouter;

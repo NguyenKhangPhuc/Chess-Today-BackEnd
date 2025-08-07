@@ -4,13 +4,15 @@ import { GAME_TYPE, GameAttributes } from "../types/types";
 
 type GameCreationAttributes = Optional<GameAttributes,
     'id' | 'createdAt' | 'endedAt' | 'updatedAt' | 'winnerId' | 'fen' | 'player1LastMoveTime' |
-    'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType'
+    'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType' | 'isDraw' | 'loserId'
 >;
 class Game extends Model<GameAttributes, GameCreationAttributes> implements GameAttributes {
     id!: string;
     player1Id!: string;
     player2Id!: string;
     winnerId?: string;
+    loserId?: string;
+    isDraw!: boolean;
     endedAt?: Date;
     createdAt?: Date;
     updatedAt?: Date;
@@ -26,6 +28,8 @@ Game.init({
     player1Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'player_1_id', allowNull: false },
     player2Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'player_2_id', allowNull: false },
     winnerId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' } },
+    loserId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' } },
+    isDraw: { type: DataTypes.BOOLEAN, defaultValue: false },
     endedAt: { type: DataTypes.DATE },
     fen: { type: DataTypes.TEXT },
     player1LastMoveTime: { type: DataTypes.DATE, field: 'player_1_last_move_time', allowNull: false, defaultValue: Sequelize.literal('CURRENT_TIMESTAMP') },

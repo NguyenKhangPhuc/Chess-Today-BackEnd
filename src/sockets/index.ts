@@ -1,5 +1,8 @@
 import { Server, Socket } from "socket.io";
-import { GAME_TYPE, Player, TokenAttributes, UserAttributes } from "../types/types";
+import {
+    GAME_TYPE
+    , Player, TokenAttributes, UserAttributes
+} from "../types/types";
 import Game from "../models/game";
 import MatchMakingQueue from "../matchmaking";
 import Move from "../models/move";
