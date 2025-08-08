@@ -16,7 +16,10 @@ import moveRouter from './routes/move';
 import { socketTokenExtractor } from './utils/middleware';
 import userRouter from './routes/user';
 import gameMessageRouter from './routes/gameMessage';
+import chatBoxRouter from './routes/chatbox';
+import messageRouter from './routes/message';
 const app = express();
+// eslint-disable-next-line @typescript-eslint/no-misused-promises
 const server = http.createServer(app);
 app.use(express.json());
 app.use(cors());
@@ -61,5 +64,7 @@ app.use('/api/game', gameRouter);
 app.use('/api/move', moveRouter);
 app.use('/api/user', userRouter);
 app.use('/api/game-messages', gameMessageRouter);
+app.use('/api/chatbox', chatBoxRouter);
+app.use('/api/message', messageRouter);
 
 export default server;

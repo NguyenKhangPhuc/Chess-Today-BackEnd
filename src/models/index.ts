@@ -1,7 +1,9 @@
+import ChatBox from "./chatbox";
 import FriendShip from "./friendship";
 import Game from "./game";
 import GameMessage from "./gameMessage";
 import Invitation from "./invitation";
+import Message from "./message";
 import Move from "./move";
 import User from "./user";
 
@@ -25,6 +27,15 @@ Move.belongsTo(User, { foreignKey: 'moverId', as: 'mover' });
 
 Game.hasMany(GameMessage, { foreignKey: 'gameId', as: 'gameMessages' });
 GameMessage.belongsTo(Game, { foreignKey: 'gameId', as: 'game' });
+
+User.hasMany(ChatBox, { foreignKey: 'user1Id', as: 'chatBoxAsUser1' });
+User.hasMany(ChatBox, { foreignKey: 'user2Id', as: 'chatBoxAsUser2' });
+ChatBox.belongsTo(User, { foreignKey: 'user1Id', as: 'user1' });
+ChatBox.belongsTo(User, { foreignKey: 'user2Id', as: 'user2' });
+
+ChatBox.hasMany(Message, { foreignKey: 'chatBoxId', as: 'messages' });
+Message.belongsTo(ChatBox, { foreignKey: 'chatBoxId', as: 'chatBox' });
+
 export default {
     User,
     Invitation,

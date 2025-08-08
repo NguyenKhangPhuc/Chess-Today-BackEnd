@@ -1,12 +1,15 @@
 import { Server, Socket } from "socket.io";
 import {
     GAME_TYPE
-    , Player, TokenAttributes, UserAttributes
+    , MessageAttributes, Player, TokenAttributes, UserAttributes
 } from "../types/types";
 import Game from "../models/game";
 import MatchMakingQueue from "../matchmaking";
 import Move from "../models/move";
 import models from "../models";
+import Message from "../models/message";
+import ChatBox from "../models/chatbox";
+import User from "../models/user";
 
 
 const userIdToSocketIdMap = new Map<string, string>();
@@ -170,7 +173,50 @@ export const setUpSocket = (io: Server) => {
             }
         });
 
+        socket.on('new_message', async (message: MessageAttributes) => {
+            if (!socket.user) {
+                console.log('Not authenticated');
+                return;
+            }
+            try {
+                const response = await Message.create(message);
+                console.log(response);
+                const chatBox = await ChatBox.findByPk(response.chatBoxId, {
+                    include: [
+                        {
+                            model: User,
+                            as: 'user1',
+                            attributes: { exclude: ['password'] }
+                        },
+                        {
+                            model: User,
+                            as: 'user2',
+                            attributes: { exclude: ['password'] }
+                        },
+                        {
+                            model: Message,
+                            as: 'messages'
+                        }
+                    ]
+                });
+                console.log(chatBox);
+                const userSocketId = userIdToSocketIdMap.get(socket.user.id);
+                const opponentSocketId = userIdToSocketIdMap.get(message.receiverId);
+                if (!userSocketId) {
+                    console.log('Missing user id');
+                    return;
+                }
+                io.to(userSocketId).emit('new_message', response, chatBox);
+                if (!opponentSocketId) {
+                    console.log('Missing opponentSocketId');
+                    return;
+                }
+                io.to(opponentSocketId).emit('new_message', response, chatBox);
+            } catch (error) {
+                console.log(error);
+            }
 
+        });
 
     });
 };

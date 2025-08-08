@@ -19,9 +19,9 @@ User.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.TEXT, allowNull: false },
     username: { type: DataTypes.TEXT, allowNull: false, validate: { isEmail: { msg: 'Username must be an email' } } },
-    elo: { type: DataTypes.INTEGER, allowNull: false },
-    rocketElo: { type: DataTypes.INTEGER, allowNull: false },
-    blitzElo: { type: DataTypes.INTEGER, allowNull: false },
+    elo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },
+    rocketElo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },
+    blitzElo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },
     password: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.BOOLEAN, defaultValue: false },
     onlineAt: { type: DataTypes.DATE }

@@ -65,7 +65,7 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
                 model: models.User,
                 as: 'friends',
                 through: {
-                    attributes: []
+                    attributes: ['id']
                 },
                 attributes: { exclude: ['password'] }
             },
@@ -73,7 +73,7 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
                 model: models.User,
                 as: 'friendOf',
                 through: {
-                    attributes: []
+                    attributes: ['id']
                 },
                 attributes: { exclude: ['password'] }
             },

@@ -94,6 +94,25 @@ export interface GameMessageAttributes {
     updatedAt?: Date
 }
 
+export interface ChatBoxAttributes {
+    id: string,
+    user1Id: string,
+    user2Id: string,
+    createdAt?: Date,
+    updatedAt?: Date,
+}
+
+export interface MessageAttributes {
+    id: string,
+    chatBoxId: string,
+    senderId: string,
+    receiverId: string,
+    content: string,
+    createdAt?: Date,
+    updatedAt?: Date
+
+}
+
 export enum GAME_TYPE {
     ROCKET = 'Rocket',
     BLITZ = 'Blitz',
