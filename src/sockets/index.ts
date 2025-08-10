@@ -46,24 +46,24 @@ export const setUpSocket = (io: Server) => {
             if (socket.user?.id != undefined) {
                 if (timeSetting.mode == GAME_TYPE.RAPID) {
                     console.log('Rapid');
-                    rapidQueue.add(player);
+                    rapidQueue.add(player, GAME_TYPE.RAPID);
                 } else if (timeSetting.mode == GAME_TYPE.BLITZ) {
                     console.log('Blitz');
-                    blitzQueue.add(player);
+                    blitzQueue.add(player, GAME_TYPE.BLITZ);
                 } else {
                     console.log('Rocket');
-                    rocketQueue.add(player);
+                    rocketQueue.add(player, GAME_TYPE.ROCKET);
                 }
 
             }
             let bestMatch;
             if (timeSetting.mode == GAME_TYPE.RAPID) {
-                bestMatch = rapidQueue.findMatch(player, 10);
+                bestMatch = rapidQueue.findMatch(player, player.elo, GAME_TYPE.RAPID, 100);
 
             } else if (timeSetting.mode == GAME_TYPE.BLITZ) {
-                bestMatch = blitzQueue.findMatch(player, 10);
+                bestMatch = blitzQueue.findMatch(player, player.blitzElo, GAME_TYPE.BLITZ, 50);
             } else {
-                bestMatch = rocketQueue.findMatch(player, 10);
+                bestMatch = rocketQueue.findMatch(player, player.rocketElo, GAME_TYPE.ROCKET, 50);
             }
 
             if (bestMatch) {

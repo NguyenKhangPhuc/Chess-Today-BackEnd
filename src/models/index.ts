@@ -14,6 +14,8 @@ Invitation.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
 
 User.belongsToMany(User, { through: FriendShip, as: 'friends', foreignKey: 'userId', otherKey: 'friendId' });
 User.belongsToMany(User, { through: FriendShip, as: 'friendOf', foreignKey: 'friendId', otherKey: 'userId' });
+FriendShip.belongsTo(User, { foreignKey: 'userId', as: 'user' });
+FriendShip.belongsTo(User, { foreignKey: 'friendId', as: 'friend' });
 
 User.hasMany(Game, { foreignKey: 'player1Id', as: 'gameAsPlayer1' });
 User.hasMany(Game, { foreignKey: 'player2Id', as: 'gameAsPlayer2' });

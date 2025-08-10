@@ -9,8 +9,8 @@ export interface UserAttributes {
     password?: string;
     status?: boolean;
     onlineAt?: Date,
-    createdAt?: Date,
-    updatedAt?: Date,
+    createdAt?: string | undefined,
+    updatedAt?: string | undefined,
     elo: number
     rocketElo: number,
     blitzElo: number,
@@ -32,15 +32,19 @@ export interface Player extends UserAttributes {
 
 export interface InvitationAttributes {
     id?: string,
-    senderId: string
-    receiverId: string,
-    status: INVITATION_STATUS
+    senderId?: string
+    receiverId?: string,
+    status: INVITATION_STATUS,
+    createdAt?: string,
+    updatedAt?: string,
 }
 
 export interface FriendAttributes {
     id?: string,
     userId: string,
     friendId: string,
+    createdAt?: string,
+    updatedAt?: string,
 }
 
 export interface UserRequest extends Request {
@@ -55,14 +59,15 @@ export interface GameAttributes {
     loserId?: string,
     isDraw: boolean
     endedAt?: Date,
-    createdAt?: Date,
-    updatedAt?: Date,
+    createdAt?: string,
+    updatedAt?: string,
     fen?: string,
     player1LastMoveTime?: Date,
     player2LastMoveTime?: Date,
     player1TimeLeft: number,
     player2TimeLeft: number,
-    gameType: GAME_TYPE
+    gameType: GAME_TYPE,
+    gameStatus: GAME_STATUS
 }
 
 export interface MoveAttributes {
@@ -79,7 +84,7 @@ export interface MoveAttributes {
     moverId: string
 }
 
-enum INVITATION_STATUS {
+export enum INVITATION_STATUS {
     'pending',
     'accepted',
     'rejected'
@@ -117,4 +122,9 @@ export enum GAME_TYPE {
     ROCKET = 'Rocket',
     BLITZ = 'Blitz',
     RAPID = 'Rapid',
+}
+
+export enum GAME_STATUS {
+    FINISHED = 'finished',
+    PLAYING = 'playing',
 }

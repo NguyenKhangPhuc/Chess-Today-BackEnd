@@ -1,10 +1,10 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 import { sequelize } from "../utils/db";
-import { GAME_TYPE, GameAttributes } from "../types/types";
+import { GAME_STATUS, GAME_TYPE, GameAttributes } from "../types/types";
 
 type GameCreationAttributes = Optional<GameAttributes,
     'id' | 'createdAt' | 'endedAt' | 'updatedAt' | 'winnerId' | 'fen' | 'player1LastMoveTime' |
-    'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType' | 'isDraw' | 'loserId'
+    'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType' | 'isDraw' | 'loserId' | 'gameStatus'
 >;
 class Game extends Model<GameAttributes, GameCreationAttributes> implements GameAttributes {
     id!: string;
@@ -14,14 +14,15 @@ class Game extends Model<GameAttributes, GameCreationAttributes> implements Game
     loserId?: string;
     isDraw!: boolean;
     endedAt?: Date;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: string;
+    updatedAt?: string;
     fen?: string;
     gameType!: GAME_TYPE;
     player1LastMoveTime?: Date | undefined;
     player2LastMoveTime?: Date | undefined;
     player1TimeLeft!: number;
     player2TimeLeft!: number;
+    gameStatus!: GAME_STATUS;
 }
 Game.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
@@ -36,7 +37,8 @@ Game.init({
     player2LastMoveTime: { type: DataTypes.DATE, field: 'player_2_last_move_time', allowNull: false, defaultValue: Sequelize.literal('CURRENT_TIMESTAMP') },
     player1TimeLeft: { type: DataTypes.INTEGER, field: 'player_1_time_left', allowNull: false, defaultValue: 600 },
     player2TimeLeft: { type: DataTypes.INTEGER, field: 'player_2_time_left', allowNull: false, defaultValue: 600 },
-    gameType: { type: DataTypes.ENUM('Rapid', 'Blitz', 'Rocket'), allowNull: false, defaultValue: 'Rapid' }
+    gameType: { type: DataTypes.ENUM('Rapid', 'Blitz', 'Rocket'), allowNull: false, defaultValue: 'Rapid' },
+    gameStatus: { type: DataTypes.ENUM('finished, playing'), allowNull: false, defaultValue: 'playing' }
 },
     {
         sequelize,

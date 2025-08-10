@@ -9,8 +9,8 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     password!: string;
     status!: boolean;
     onlineAt!: Date;
-    createdAt?: Date;
-    updatedAt?: Date;
+    createdAt?: string;
+    updatedAt?: string;
     elo!: number;
     rocketElo!: number;
     blitzElo!: number;

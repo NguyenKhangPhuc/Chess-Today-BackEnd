@@ -7,6 +7,8 @@ class FriendShip extends Model<FriendAttributes, FriendShipCreationAttributes> i
     id!: string;
     userId!: string;
     friendId!: string;
+    createdAt?: string;
+    updatedAt?: string;
 }
 FriendShip.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
