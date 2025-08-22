@@ -1,12 +1,12 @@
 
 import { OpenAI } from 'openai';
 import { OPENAI_API_KEY } from '../src/utils/config';
+import { EngineScore } from '../src/types/types';
 
 interface boardState {
     fen: string;
     bestMove: string;
-    pv?: Array<string>;
-    score?: string | number;
+    score?: EngineScore | null;
 
 }
 class OpenAIEngine {
@@ -16,15 +16,25 @@ class OpenAIEngine {
         this.client = new OpenAI({ apiKey });
     }
 
-    async explainMove({ fen, bestMove, pv, score, }: boardState): Promise<string> {
+    async explainMove({ fen, bestMove, score }: boardState): Promise<string> {
         const prompt = `
-Bạn là một huấn luyện viên cờ vua. Máy vừa chọn nước đi: **${bestMove}**
+        You are a chess coach. I will provide you with the current board position in FEN format and the move that the Player is about to move in this FEN situation. Also the score of the move will be sent.
+Your tasks:
+Look at the FEN carefully, understand the board. Limit the inaccuracy of the answer down as low as posible. 
 
-- FEN hiện tại: ${fen}
-- Đánh giá: ${typeof score === 'number' ? `Điểm số: ${score}` : score}
-- Chuỗi nước đi dự đoán: ${pv?.join(' ')}
+Classify the move into one of the following categories (from best to worst): Brilliant, Great, Best, Excellent, Good, Book, Inaccuracy, Mistake, Miss, Blunder.
 
-Giải thích đơn giản, rõ ràng, dễ hiểu vì sao máy lại chọn nước đi này.
+Give a short explanation (only 1–2 short sentences, no long sentences) about why it fits that category.
+
+Always return the answer in this format:
+
+<move> is a <category> move, <short explanation>
+
+
+Now follow the requirements: Give me the answer for this move:
+The fen of the move is: ${fen},
+The move have just made is: ${bestMove},
+The score after make the move is: score type: ${score?.type} - value: ${score?.value}
 `;
 
         const response = await this.client.chat.completions.create({

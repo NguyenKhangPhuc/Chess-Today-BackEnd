@@ -3,7 +3,6 @@ import { MoveAttributes } from '../types/types';
 import Move from '../models/move';
 import { tokenExtractor } from '../utils/middleware';
 import User from '../models/user';
-
 const moveRouter = express.Router();
 
 moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveAttributes>, res: Response) => {
@@ -20,6 +19,7 @@ moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveA
         console.log(error);
     }
 });
+
 
 moveRouter.post('/game', tokenExtractor, async (req: Request<unknown, unknown, { gameId: string }>, res: Response) => {
     console.log(req.user, 'Current user');

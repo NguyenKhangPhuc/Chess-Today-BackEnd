@@ -6,6 +6,7 @@ import models from '../models';
 import { tokenExtractor } from '../utils/middleware';
 import { Op } from 'sequelize';
 import { PaginationCursor } from '../helpers/pagination';
+import User from '../models/user';
 
 const gameRouter = express.Router();
 
@@ -17,6 +18,60 @@ gameRouter.post('/', async (req: Request<unknown, unknown, GameAttributes>, res:
     } catch (err) {
         console.log(err);
     }
+});
+
+gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { type: string }>, res: Response) => {
+    if (!req.user) {
+        res.json({ error: 'Not authenticated' });
+        return;
+    }
+    const bot = await User.findOne({
+        where: {
+            isBot: true
+        },
+        attributes: { exclude: ['password'] }
+    });
+    if (!bot) {
+        res.json({ error: 'Bot not found' });
+        return;
+    }
+    const response = await Game.create({ player1Id: req.body.type === 'white' ? req.user.id : bot.id, player2Id: req.body.type === 'white' ? bot.id : req.user.id, isBotGame: true });
+    res.json({ response });
+    return;
+});
+
+gameRouter.put('/fen/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { fen: string }>, res: Response) => {
+    if (!req.user) {
+        res.json({ error: 'Not authenticated' });
+        return;
+    }
+    const game = await Game.findByPk(req.params.id, {
+        include: [
+            {
+                model: Move,
+                as: 'moveHistory'
+            },
+            {
+                model: models.User,
+                as: 'player1',
+                attributes: { exclude: ['password'] }
+            },
+            {
+                model: models.User,
+                as: 'player2',
+                attributes: { exclude: ['password'] }
+            }
+        ]
+    });
+    if (!game) {
+        res.json({ error: 'Game not found' });
+        return;
+    }
+    await game.update({
+        fen: req.body.fen
+    });
+
+    res.json(game);
 });
 
 gameRouter.get('/', async (_: Request, res: Response) => {

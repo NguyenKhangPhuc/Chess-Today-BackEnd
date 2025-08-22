@@ -217,6 +217,14 @@ export const setUpSocket = (io: Server) => {
             }
 
         });
+        socket.on('new_move_history', (opponentId: string) => {
+            const opponentSocketId = userIdToSocketIdMap.get(opponentId);
+            if (!opponentSocketId) {
+                console.log('no socketid');
+                return;
+            }
+            io.to(opponentSocketId).emit('new_move_history');
+        });
 
     });
 };

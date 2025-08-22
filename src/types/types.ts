@@ -14,6 +14,7 @@ export interface UserAttributes {
     elo: number
     rocketElo: number,
     blitzElo: number,
+    isBot: boolean
 }
 
 
@@ -67,7 +68,8 @@ export interface GameAttributes {
     player1TimeLeft: number,
     player2TimeLeft: number,
     gameType: GAME_TYPE,
-    gameStatus: GAME_STATUS
+    gameStatus: GAME_STATUS,
+    isBotGame?: boolean
 }
 
 export interface MoveAttributes {
@@ -91,7 +93,7 @@ export enum INVITATION_STATUS {
 }
 
 export interface GameMessageAttributes {
-    id: string,
+    id?: string,
     gameId: string,
     senderId: string,
     content: string,
@@ -127,4 +129,9 @@ export enum GAME_TYPE {
 export enum GAME_STATUS {
     FINISHED = 'finished',
     PLAYING = 'playing',
+}
+
+export interface EngineScore {
+    type: string,
+    value: number
 }

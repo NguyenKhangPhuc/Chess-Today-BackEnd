@@ -24,7 +24,7 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         username: foundUser.username,
         name: foundUser.name,
     };
-
+    console.log('Signining in secret', JWT_SECRET);
     const token = jwt.sign(userForToken, JWT_SECRET);
     res.json({ token: token });
     return;

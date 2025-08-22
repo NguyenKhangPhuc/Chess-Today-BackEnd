@@ -1,4 +1,5 @@
 import { spawn } from 'child_process';
+import { EngineScore } from '../src/types/types';
 
 export class StockfishEngine {
     private process;
@@ -11,16 +12,23 @@ export class StockfishEngine {
         });
     }
 
+    parseScore(line: string): EngineScore | null {
+        const mate = line.match(/\bscore\s+mate\s+(-?\d+)/);
+        if (mate) return { type: "mate", value: parseInt(mate[1], 10) };
+        const cp = line.match(/\bscore\s+cp\s+(-?\d+)/);
+        if (cp) return { type: "cp", value: parseInt(cp[1], 10) };
+        return null;
+    }
+
     sendCommand(cmd: string) {
         // Gửi lệnh cho engine như "position", "go", v.v.
         this.process.stdin.write(cmd + '\n');
     }
 
-    async evaluateFen(fen: string, depth = 15): Promise<{ bestMove: string; pv: Array<string>; score: number | string }> {
+    async evaluateFen(fen: string, depth = 15): Promise<{ bestMove: string; score: EngineScore | null }> {
         return new Promise((resolve) => {
             let bestMove = '';
-            const pv: Array<string> = [];
-            let score: number | string;
+            let score: EngineScore | null;
 
             this.sendCommand(`uci`);
             this.sendCommand(`ucinewgame`);
@@ -33,21 +41,35 @@ export class StockfishEngine {
                 console.log(lines);
                 for (const line of lines) {
                     if (line.startsWith('info')) {
-                        const infoParts = line.split(' ');
-                        const scoreIndex = infoParts.indexOf('score');
-                        if (scoreIndex !== -1) {
-                            const scoreType = infoParts[scoreIndex + 1];
-                            const scoreValue = infoParts[scoreIndex + 2];
-                            if (scoreType === 'cp') {
-                                score = parseInt(scoreValue, 10);
-                            } else if (scoreType === 'mate') {
-                                score = `Check mate ${scoreValue}`;
-                            }
-                        }
+                        score = this.parseScore(line);
                     }
                     if (line.startsWith('bestmove')) {
                         bestMove = line.split(' ')[1];
-                        resolve({ bestMove, pv, score });
+                        resolve({ bestMove, score });
+                    }
+                }
+            });
+        });
+    }
+
+    async evaluateMoveScore(fen: string, moveUci: string, depth = 15): Promise<{ score: EngineScore | null }> {
+        return new Promise((resolve) => {
+            let score: EngineScore | null;
+
+            this.sendCommand('uci');
+            this.sendCommand('isready');
+            this.sendCommand(`position fen ${fen}`);
+            this.sendCommand(`go depth ${depth} searchmoves ${moveUci}`);
+
+            this.process.stdout.on('data', (data: Buffer) => {
+                const lines = data.toString().split('\n');
+                console.log(lines);
+                for (const line of lines) {
+                    if (line.startsWith('info')) {
+                        score = this.parseScore(line);
+                    }
+                    if (line.startsWith('bestmove')) {
+                        resolve({ score });
                     }
                 }
             });
@@ -58,3 +80,4 @@ export class StockfishEngine {
         this.process.kill(); // Dừng engine sau khi xong
     }
 }
+

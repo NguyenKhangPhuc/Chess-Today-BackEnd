@@ -24,6 +24,7 @@ export const tokenExtractor: RequestHandler = async (req, res, next) => {
     console.log('This is token from REST', token);
     if (token && token.startsWith('Bearer ')) {
         const receivedToken = token.substring(7);
+        console.log('Verifying secret', JWT_SECRET);
         const decodedToken = jwt.verify(receivedToken, JWT_SECRET) as TokenAttributes;
         if (decodedToken) {
             const foundUser = await models.User.findByPk(decodedToken.id);

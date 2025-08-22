@@ -5,6 +5,7 @@ import { GAME_STATUS, GAME_TYPE, GameAttributes } from "../types/types";
 type GameCreationAttributes = Optional<GameAttributes,
     'id' | 'createdAt' | 'endedAt' | 'updatedAt' | 'winnerId' | 'fen' | 'player1LastMoveTime' |
     'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType' | 'isDraw' | 'loserId' | 'gameStatus'
+    | 'isBotGame'
 >;
 class Game extends Model<GameAttributes, GameCreationAttributes> implements GameAttributes {
     id!: string;
@@ -23,11 +24,12 @@ class Game extends Model<GameAttributes, GameCreationAttributes> implements Game
     player1TimeLeft!: number;
     player2TimeLeft!: number;
     gameStatus!: GAME_STATUS;
+    isBotGame!: boolean;
 }
 Game.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     player1Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'player_1_id', allowNull: false },
-    player2Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'player_2_id', allowNull: false },
+    player2Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'player_2_id' },
     winnerId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' } },
     loserId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' } },
     isDraw: { type: DataTypes.BOOLEAN, defaultValue: false },
@@ -38,7 +40,8 @@ Game.init({
     player1TimeLeft: { type: DataTypes.INTEGER, field: 'player_1_time_left', allowNull: false, defaultValue: 600 },
     player2TimeLeft: { type: DataTypes.INTEGER, field: 'player_2_time_left', allowNull: false, defaultValue: 600 },
     gameType: { type: DataTypes.ENUM('Rapid', 'Blitz', 'Rocket'), allowNull: false, defaultValue: 'Rapid' },
-    gameStatus: { type: DataTypes.ENUM('finished, playing'), allowNull: false, defaultValue: 'playing' }
+    gameStatus: { type: DataTypes.ENUM('finished, playing'), allowNull: false, defaultValue: 'playing' },
+    isBotGame: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
 },
     {
         sequelize,
