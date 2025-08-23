@@ -11,14 +11,19 @@ analyzeRouter.post('/', async (req: Request<unknown, unknown, { fen: string }>, 
     const fen = req.body.fen;
 
     if (!fen) {
-        res.status(400).json({ error: 'FEN is required' });
+        res.status(401).json({ error: 'FEN is required' });
         return;
     }
 
     const engine = new StockfishEngine();
     const moveInfo = await engine.evaluateFen(fen, 20);
     engine.stop();
-    res.json({ moveInfo });
+    if (!moveInfo) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json({ moveInfo });
+    return;
 });
 
 
@@ -28,22 +33,25 @@ analyzeRouter.post('/explanation', async (req: Request<unknown, unknown, { move:
     if (!score) {
         const engine = new StockfishEngine();
         const { score: receivedScore } = await engine.evaluateMoveScore(req.body.beforeFen, req.body.move);
+        if (!receivedScore) {
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
         score = receivedScore;
     }
-
-    try {
-        const response = await openAIEngine.explainMove({ bestMove: req.body.move, fen: req.body.beforeFen, score: score });
-        const gameMessage = {
-            senderId: req.body.senderId,
-            gameId: req.body.gameId,
-            content: response
-        };
-        await GameMessage.create(gameMessage);
-        res.json(response);
+    const response = await openAIEngine.explainMove({ bestMove: req.body.move, fen: req.body.beforeFen, score: score });
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
         return;
-    } catch (error) {
-        console.log(error);
     }
+    const gameMessage = {
+        senderId: req.body.senderId,
+        gameId: req.body.gameId,
+        content: response
+    };
+    await GameMessage.create(gameMessage);
+    res.status(200).json(response);
+    return;
 });
 
 export default analyzeRouter;

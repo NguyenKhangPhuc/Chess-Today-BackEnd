@@ -13,7 +13,7 @@ import inviteRouter from './routes/invite';
 import friendshipRouter from './routes/friendship';
 import gameRouter from './routes/game';
 import moveRouter from './routes/move';
-import { socketTokenExtractor } from './utils/middleware';
+import { errorHandler, socketTokenExtractor, unknownEndpoint } from './utils/middleware';
 import userRouter from './routes/user';
 import gameMessageRouter from './routes/gameMessage';
 import chatBoxRouter from './routes/chatbox';
@@ -66,5 +66,8 @@ app.use('/api/user', userRouter);
 app.use('/api/game-messages', gameMessageRouter);
 app.use('/api/chatbox', chatBoxRouter);
 app.use('/api/message', messageRouter);
+
+app.use(errorHandler);
+app.use(unknownEndpoint);
 
 export default server;

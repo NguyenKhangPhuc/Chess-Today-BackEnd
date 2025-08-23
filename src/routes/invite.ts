@@ -27,27 +27,27 @@ inviteRouter.get('/sender/user/:id', tokenExtractor, async (req: Request<{ id: s
             ]
         };
     }
-    try {
-        const response = await Invitation.findAll({
-            where: Object.keys(where).length > 0 ? where : {
-                senderId: req.params.id
-            },
-            order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
-            limit: Number(limit) + 1,
-            include: [
-                {
-                    model: User,
-                    as: 'receiver',
-                    attributes: { exclude: ['password'] }
-                }
-            ]
-        });
-        const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<InvitationAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
-        res.json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    const response = await Invitation.findAll({
+        where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
+            senderId: req.params.id
+        },
+        order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
+        limit: Number(limit) + 1,
+        include: [
+            {
+                model: User,
+                as: 'receiver',
+                attributes: { exclude: ['password'] }
+            }
+        ]
+    });
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
         return;
-    } catch (error) {
-        console.log(error);
     }
+    const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<InvitationAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
+    res.status(200).json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    return;
 });
 
 inviteRouter.get('/receiver/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
@@ -69,50 +69,57 @@ inviteRouter.get('/receiver/user/:id', tokenExtractor, async (req: Request<{ id:
             ]
         };
     }
-    try {
-        const response = await Invitation.findAll({
-            where: Object.keys(where).length > 0 ? where : {
-                receiverId: req.params.id
-            },
-            order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
-            limit: Number(limit) + 1,
-            include: [
-                {
-                    model: User,
-                    as: 'sender',
-                    attributes: { exclude: ['password'] }
-                }
-            ]
-        });
-        const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<InvitationAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
-        res.json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    const response = await Invitation.findAll({
+        where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
+            receiverId: req.params.id
+        },
+        order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
+        limit: Number(limit) + 1,
+        include: [
+            {
+                model: User,
+                as: 'sender',
+                attributes: { exclude: ['password'] }
+            }
+        ]
+    });
+
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
         return;
-    } catch (error) {
-        console.log(error);
     }
+
+    const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<InvitationAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
+    res.status(200).json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    return;
 });
 
 inviteRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, InvitationAttributes>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'not authenticated' });
+        res.status(401).json({ error: 'not authenticated' });
         return;
     }
     const { receiverId } = req.body;
     const senderId = req.user?.id;
-    const reponse = await models.Invitation.create({ receiverId, senderId });
-    res.json(reponse);
+    const response = await models.Invitation.create({ receiverId, senderId });
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 });
 
 inviteRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'not authenticated' });
+        res.status(401).json({ error: 'not authenticated' });
         return;
     }
     await models.Invitation.destroy({
         where: { id: req.params.id }
     });
-    res.json(204);
+    res.status(204).end();
+    return;
 });
 
 export default inviteRouter;

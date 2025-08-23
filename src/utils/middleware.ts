@@ -1,8 +1,8 @@
-import { RequestHandler } from "express";
+import { ErrorRequestHandler, RequestHandler } from "express";
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from "./config";
 import models from "../models";
-import { TokenAttributes, } from "../types/types";
+import { CustomError, TokenAttributes, } from "../types/types";
 import { Socket } from "socket.io";
 
 
@@ -55,12 +55,39 @@ export const socketTokenExtractor = async (socket: Socket, next: (err?: Error) =
 
             }
         } else {
-            next(new Error('invalid Token'));
+            next(new Error('JsonWebTokenError'));
             return;
         }
     } else {
-        next(new Error('Missing Token'));
+        next(new Error('JsonWebTokenError'));
         return;
     }
     next();
+};
+
+export const unknownEndpoint: RequestHandler = (_, response) => {
+    response.status(404).send({ error: 'unknown endpoint' });
+};
+
+export const errorHandler: ErrorRequestHandler = (error: CustomError, _, res, next) => {
+    console.log(error);
+    if (error.name === 'CastError') {
+        res.status(400).send({ error: 'malformatted id' });
+        return;
+    } else if (error.name === 'ValidationError') {
+        res.status(400).json({ error: error.message });
+        return;
+    } else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
+        res.status(400).json({ error: 'expected `username` need to be unique' });
+        return;
+    } else if (error.name === 'JsonWebTokenError' || error.message == 'JsonWebTokenError') {
+        res.status(401).json({ error: "invalid token or missing token" });
+        return;
+    } else if (error.name === 'TokenExpiredError') {
+        res.status(401).json({ error: 'token expired' });
+        return;
+    } else {
+        res.status(500).json({ error, message: 'Unknown error' });
+    }
+    next(error);
 };

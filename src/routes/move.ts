@@ -7,24 +7,24 @@ const moveRouter = express.Router();
 
 moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveAttributes>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const move = req.body;
-    try {
-        const response = await Move.create(move);
-        res.json(response);
+    const response = await Move.create(move);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
         return;
-    } catch (error) {
-        console.log(error);
     }
+    res.status(200).json(response);
+    return;
 });
 
 
 moveRouter.post('/game', tokenExtractor, async (req: Request<unknown, unknown, { gameId: string }>, res: Response) => {
     console.log(req.user, 'Current user');
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const response = await Move.findAll({
@@ -39,7 +39,11 @@ moveRouter.post('/game', tokenExtractor, async (req: Request<unknown, unknown, {
             }
         ]
     });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 
 });

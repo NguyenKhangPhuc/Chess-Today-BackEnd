@@ -51,8 +51,8 @@ class MatchMakingQueue {
         console.log(this.playerQueue);
     }
 
-    public remove(player: Player) {
-        const index = this.playerQueue.findIndex((e) => e.id === player.id);
+    public remove(playerId: string) {
+        const index = this.playerQueue.findIndex((e) => e.id === playerId);
         if (index !== -1) {
             this.playerQueue.splice(index, 1);
         }

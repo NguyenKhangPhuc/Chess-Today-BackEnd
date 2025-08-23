@@ -10,19 +10,20 @@ import User from '../models/user';
 
 const gameRouter = express.Router();
 
-gameRouter.post('/', async (req: Request<unknown, unknown, GameAttributes>, res: Response) => {
+gameRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, GameAttributes>, res: Response) => {
     const game = req.body;
-    try {
-        const response = await Game.create(game);
-        res.json(response);
-    } catch (err) {
-        console.log(err);
+    const response = await Game.create(game);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
     }
+    res.status(200).json(response);
+    return;
 });
 
 gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { type: string }>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const bot = await User.findOne({
@@ -32,17 +33,21 @@ gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { 
         attributes: { exclude: ['password'] }
     });
     if (!bot) {
-        res.json({ error: 'Bot not found' });
+        res.status(401).json({ error: 'Bot not found' });
         return;
     }
     const response = await Game.create({ player1Id: req.body.type === 'white' ? req.user.id : bot.id, player2Id: req.body.type === 'white' ? bot.id : req.user.id, isBotGame: true });
-    res.json({ response });
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json({ response });
     return;
 });
 
 gameRouter.put('/fen/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { fen: string }>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const game = await Game.findByPk(req.params.id, {
@@ -64,17 +69,18 @@ gameRouter.put('/fen/:id', tokenExtractor, async (req: Request<{ id: string }, u
         ]
     });
     if (!game) {
-        res.json({ error: 'Game not found' });
+        res.status(401).json({ error: 'Game not found' });
         return;
     }
     await game.update({
         fen: req.body.fen
     });
 
-    res.json(game);
+    res.status(200).json(game);
+    return;
 });
 
-gameRouter.get('/', async (_: Request, res: Response) => {
+gameRouter.get('/', tokenExtractor, async (_: Request, res: Response) => {
     const response = await Game.findAll({
         include: [
             {
@@ -84,16 +90,22 @@ gameRouter.get('/', async (_: Request, res: Response) => {
         ]
 
     });
-    res.json(response);
+
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 });
 
-gameRouter.get('/user/:id', async (req: Request<{ id: string }>, res: Response) => {
+gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     const { after, before, limit } = req.query;
     if (!limit) {
-        res.json({ error: 'missing limit' });
+        res.status(401).json({ error: 'Missing limit' });
         return;
     }
+    console.log(after, before, limit);
     let where = {};
     if (after) {
         where = {
@@ -122,43 +134,44 @@ gameRouter.get('/user/:id', async (req: Request<{ id: string }>, res: Response) 
             ]
         };
     }
-    try {
-        const response = await Game.findAll({
-            where: Object.keys(where).length > 0 ? where : {
-                [Op.or]: [
-                    { player1Id: req.params?.id },
-                    { player2Id: req.params?.id }
-                ]
-            },
-            order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
-            limit: Number(limit) + 1,
-            include: [
-                {
-                    model: Move,
-                    as: 'moveHistory'
-                },
-                {
-                    model: models.User,
-                    as: 'player1',
-                    attributes: { exclude: ['password'] }
-                },
-                {
-                    model: models.User,
-                    as: 'player2',
-                    attributes: { exclude: ['password'] }
-                }
+    const response = await Game.findAll({
+        where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
+            [Op.or]: [
+                { player1Id: req.params?.id },
+                { player2Id: req.params?.id }
             ]
-        });
-        const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<GameAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
-        res.json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+        },
+        order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
+        limit: Number(limit) + 1,
+        include: [
+            {
+                model: Move,
+                as: 'moveHistory'
+            },
+            {
+                model: models.User,
+                as: 'player1',
+                attributes: { exclude: ['password'] }
+            },
+            {
+                model: models.User,
+                as: 'player2',
+                attributes: { exclude: ['password'] }
+            }
+        ]
+    });
+
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
         return;
-    } catch (error) {
-        console.log('This is error', error);
     }
+    const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<GameAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
+    res.status(200).json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    return;
 });
 
 
-gameRouter.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
+gameRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     const response = await Game.findByPk(req.params.id, {
         include: [
             {
@@ -177,13 +190,17 @@ gameRouter.get('/:id', async (req: Request<{ id: string }>, res: Response) => {
             }
         ]
     });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 });
 
 gameRouter.put('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { newTimeLeft: number }>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const response = await Game.findByPk(req.params.id, {
@@ -205,48 +222,66 @@ gameRouter.put('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
         ]
     });
     if (!response) {
-        res.json({ message: 'Game not found' });
+        res.status(401).json({ message: 'Game not found' });
         return;
     }
     if (req.user.id === response.player1Id) {
         const newPlayer1LastMoveTime = new Date();
         const result = await response.update({ player1TimeLeft: req.body.newTimeLeft, player1LastMoveTime: newPlayer1LastMoveTime });
-        res.json({ message: 'Update successfully', result });
+        if (!result) {
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        res.status(200).json({ message: 'Update successfully', result });
+        return;
     } else {
         const newPlayer2LastMoveTime = new Date();
         const result = await response.update({ player2TimeLeft: req.body.newTimeLeft, player2LastMoveTime: newPlayer2LastMoveTime });
-        res.json({ message: 'Update successfully', result });
+        if (!result) {
+            res.status(500).json({ error: 'Internal Server Error' });
+            return;
+        }
+        res.status(200).json({ message: 'Update successfully', result });
+        return;
     }
 });
 
 gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const game = await Game.findByPk(req.params.id);
     if (!game) {
-        res.json({ error: 'Game not found' });
+        res.status(401).json({ error: 'Game not found' });
         return;
     }
     const response = await game.update({ isDraw: true, gameStatus: GAME_STATUS.FINISHED });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 });
 
 gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id: string }, unknown, { winnerId: string, loserId: string }>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
     }
     const game = await Game.findByPk(req.params.id);
     if (!game) {
-        res.json({ error: 'Game not found' });
+        res.status(401).json({ error: 'Game not found' });
         return;
     }
     console.log('This is winner and loser', req.body.winnerId, req.body.loserId);
 
     const response = await game.update({ winnerId: req.body.winnerId, loserId: req.body.loserId, gameStatus: GAME_STATUS.FINISHED });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 
 });

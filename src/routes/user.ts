@@ -12,7 +12,7 @@ const userRouter = express.Router();
 userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) => {
 
     if (!req.user || !req.user.id) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
 
@@ -30,6 +30,7 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
         else if (e.friendId === req.user?.id) return [e.userId];
         return [];
     });
+
     const { limit, after, before } = req.query;
     let where = {};
     if (after) {
@@ -48,21 +49,20 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
             ]
         };
     }
-    try {
-        const response = await models.User.findAll({
-            where: Object.keys(where).length > 0 ? where : {
-                id: { [Op.notIn]: [...excludeIds, req.user.id] }
-            },
-            limit: Number(limit) + 1,
-            attributes: { exclude: ['password'] },
-        });
-
-        const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<UserAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
-        res.json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    const response = await models.User.findAll({
+        where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
+            id: { [Op.notIn]: [...excludeIds, req.user.id] }
+        },
+        limit: Number(limit) + 1,
+        attributes: { exclude: ['password'] },
+    });
+    if (!response) {
+        res.status(500).json({ error: 'Internal server error' });
         return;
-    } catch (error) {
-        console.log(error);
     }
+    const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<UserAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
+    res.status(200).json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
+    return;
 });
 
 userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
@@ -148,45 +148,57 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
             }
         ]
     });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+    }
+    res.status(200).json(response);
 });
 
 userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unknown, { gameType: GAME_TYPE, userElo: number }>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     console.log(req.body);
     const user = await User.findByPk(req.user.id);
     if (!user) {
-        res.json({ error: 'User not found' });
+        res.status(401).json({ error: 'User not found' });
         return;
     }
-    try {
-        if (req.body.gameType === GAME_TYPE.ROCKET) {
-            const response = await user.update({
-                rocketElo: req.body.userElo
-            });
-            res.json(response);
-            return;
-        } else if (req.body.gameType === GAME_TYPE.BLITZ) {
-            const response = await user.update({
-                blitzElo: req.body.userElo
-            });
-            res.json(response);
-            return;
-        } else if (req.body.gameType === GAME_TYPE.RAPID) {
-            const response = await user.update({
-                elo: req.body.userElo
-            });
-            res.json(response);
+    if (req.body.gameType === GAME_TYPE.ROCKET) {
+        const response = await user.update({
+            rocketElo: req.body.userElo
+        });
+        if (!response) {
+            res.status(500).json({ error: 'Internal server error' });
             return;
         }
-        res.json({ error: 'game type incorrect' });
+        res.status(200).json(response);
         return;
-    } catch (error) {
-        console.log('This is the error', error);
+    } else if (req.body.gameType === GAME_TYPE.BLITZ) {
+        const response = await user.update({
+            blitzElo: req.body.userElo
+        });
+        if (!response) {
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        res.status(200).json(response);
+        return;
+    } else if (req.body.gameType === GAME_TYPE.RAPID) {
+        const response = await user.update({
+            elo: req.body.userElo
+        });
+        if (!response) {
+            res.status(500).json({ error: 'Internal server error' });
+            return;
+        }
+        res.status(200).json(response);
+        return;
     }
+    res.status(400).json({ error: 'Game type incorrect' });
+    return;
 });
 
 

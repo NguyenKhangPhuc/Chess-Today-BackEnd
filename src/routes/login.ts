@@ -15,7 +15,7 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         }
     });
     if (foundUser == null) {
-        res.json({ message: 'Wrong credentials' });
+        res.status(400).json({ message: 'Wrong credentials' });
         return;
     }
 
@@ -26,7 +26,11 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
     };
     console.log('Signining in secret', JWT_SECRET);
     const token = jwt.sign(userForToken, JWT_SECRET);
-    res.json({ token: token });
+    if (!token) {
+        res.status(500).json({ error: 'Token generation failed' });
+        return;
+    }
+    res.status(200).json({ token: token });
     return;
 });
 
@@ -66,7 +70,11 @@ loginRouter.get('/', async (_: Request, res: Response) => {
             }
         ]
     });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server error' });
+        return;
+    }
+    res.status(200).json(response);
 });
 
 export default loginRouter;

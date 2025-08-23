@@ -7,7 +7,7 @@ const gameMessageRouter = express.Router();
 
 gameMessageRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const response = await GameMessage.findAll({
@@ -15,18 +15,26 @@ gameMessageRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }
             gameId: req.params.id
         },
     });
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
 });
 
 
 gameMessageRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, GameMessageAttributes>, res: Response) => {
     if (!req.user) {
-        res.json({ error: 'Not authenticated' });
+        res.status(401).json({ error: 'Not authenticated' });
         return;
     }
     const newMessage = req.body;
     const response = await GameMessage.create(newMessage);
-    res.json(response);
+    if (!response) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    res.status(200).json(response);
     return;
 });
 
