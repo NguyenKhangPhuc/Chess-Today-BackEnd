@@ -198,6 +198,15 @@ gameRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }>, res:
     return;
 });
 
+gameRouter.post('/check-ongoing-game', tokenExtractor, async (_: Request, res: Response) => {
+    const response = await Game.findOne({ where: { gameStatus: GAME_STATUS.PLAYING } });
+    if (response) {
+        res.status(409).json({ errorCode: "GAME_IN_PROGRESS", message: "Game is currently ongoing", game: response });
+        return;
+    }
+    res.status(200).json({ message: 'No ongoing game' });
+});
+
 gameRouter.put('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { newTimeLeft: number }>, res: Response) => {
     if (!req.user) {
         res.status(401).json({ error: 'Not authenticated' });
