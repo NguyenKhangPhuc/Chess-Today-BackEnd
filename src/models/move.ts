@@ -14,6 +14,8 @@ class Move extends Model<MoveAttributes, MoveCreationAttributes> implements Move
     to!: string;
     san!: string;
     lan!: string;
+    promotion?: string | undefined;
+    playerTimeLeft!: number;
     moverId!: string;
 }
 Move.init({
@@ -27,6 +29,8 @@ Move.init({
     to: { type: DataTypes.TEXT, allowNull: false },
     san: { type: DataTypes.TEXT, allowNull: false },
     lan: { type: DataTypes.TEXT, allowNull: false },
+    promotion: { type: DataTypes.TEXT, allowNull: true },
+    playerTimeLeft: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 600 },
     moverId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false }
 }, {
     sequelize,

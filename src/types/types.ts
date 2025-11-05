@@ -83,6 +83,8 @@ export interface MoveAttributes {
     to: string,
     san: string,
     lan: string,
+    promotion?: string,
+    playerTimeLeft: number,
     moverId: string
 }
 
