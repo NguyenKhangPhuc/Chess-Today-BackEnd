@@ -142,3 +142,47 @@ export interface CustomError {
     name: string,
     message: string
 }
+
+export enum PUZZLE_LEVEL {
+    EASY = 1,
+    MEDIUM = 2,
+    HARD = 3,
+}
+
+export interface PuzzleAttributes {
+    id: string,
+    fen: string,
+    title: string,
+    difficulty: PUZZLE_LEVEL,
+    createdAt?: string,
+    updatedAt?: string,
+}
+
+export enum PUZZLE_STATUS {
+    SOLVED = 'solved',
+    UNSOLVED = 'unsolved',
+}
+
+export interface UserPuzzleRelationAttribute {
+    id: string,
+    userId: string,
+    puzzleId: string,
+    attempt: number,
+    status: PUZZLE_STATUS,
+    createdAt?: string,
+    updatedAt?: string
+}
+
+export interface PuzzleMoveAttributes {
+    id: string,
+    before: string,
+    after: string,
+    color: string,
+    piece: string,
+    from: string,
+    to: string,
+    san: string,
+    lan: string,
+    promotion?: string,
+    puzzleId: string,
+}

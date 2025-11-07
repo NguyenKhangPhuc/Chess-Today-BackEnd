@@ -5,7 +5,10 @@ import GameMessage from "./gameMessage";
 import Invitation from "./invitation";
 import Message from "./message";
 import Move from "./move";
+import Puzzle from "./puzzle";
+import PuzzleMove from "./puzzleMove";
 import User from "./user";
+import UserPuzzles from "./userPuzzles";
 
 User.hasMany(Invitation, { foreignKey: 'senderId', as: 'sentInvitations' });
 User.hasMany(Invitation, { foreignKey: 'receiverId', as: 'receivedInvitations' });
@@ -37,6 +40,11 @@ ChatBox.belongsTo(User, { foreignKey: 'user2Id', as: 'user2' });
 
 ChatBox.hasMany(Message, { foreignKey: 'chatBoxId', as: 'messages' });
 Message.belongsTo(ChatBox, { foreignKey: 'chatBoxId', as: 'chatBox' });
+
+Puzzle.belongsToMany(User, { through: UserPuzzles, as: 'puzzles', foreignKey: 'puzzleId' });
+User.belongsToMany(Puzzle, { through: UserPuzzles, as: 'users', foreignKey: 'userId' });
+
+Puzzle.hasMany(PuzzleMove, { foreignKey: 'puzzleId', as: 'validMoves' });
 
 export default {
     User,
