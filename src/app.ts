@@ -19,6 +19,8 @@ import gameMessageRouter from './routes/gameMessage';
 import chatBoxRouter from './routes/chatbox';
 import messageRouter from './routes/message';
 import puzzleRouter from './routes/puzzles';
+import puzzleMovesRouter from './routes/puzzleMoves';
+import userPuzzlesRouter from './routes/userPuzzles';
 const app = express();
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 const server = http.createServer(app);
@@ -68,6 +70,8 @@ app.use('/api/game-messages', gameMessageRouter);
 app.use('/api/chatbox', chatBoxRouter);
 app.use('/api/message', messageRouter);
 app.use('/api/puzzles', puzzleRouter);
+app.use('/api/puzzle-moves', puzzleMovesRouter);
+app.use('/api/user-puzzle', userPuzzlesRouter);
 
 app.use(errorHandler);
 app.use(unknownEndpoint);

@@ -23,7 +23,8 @@ UserPuzzles.init({
     sequelize,
     underscored: true,
     timestamps: true,
-    modelName: 'UserPuzzle'
+    modelName: 'UserPuzzle',
+    tableName: 'users_puzzles'
 });
 
 export default UserPuzzles;

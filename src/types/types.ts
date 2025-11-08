@@ -164,7 +164,7 @@ export enum PUZZLE_STATUS {
 }
 
 export interface UserPuzzleRelationAttribute {
-    id: string,
+    id?: string,
     userId: string,
     puzzleId: string,
     attempt: number,
