@@ -1,15 +1,15 @@
 import { Server, Socket } from "socket.io";
 import {
     GAME_TYPE
-    , MessageAttributes, Player, TokenAttributes, UserAttributes
+    , MessageAttributes, MoveAttributes, Player, TokenAttributes, UserAttributes
 } from "../types/types";
 import Game from "../models/game";
 import MatchMakingQueue from "../matchmaking";
-import Move from "../models/move";
-import models from "../models";
 import Message from "../models/message";
 import ChatBox from "../models/chatbox";
 import User from "../models/user";
+import { sequelize } from "../utils/db";
+import Move from "../models/move";
 
 
 const userIdToSocketIdMap = new Map<string, string>();
@@ -36,7 +36,6 @@ export const setUpSocket = (io: Server) => {
 
         });
         socket.on('join_queue', async (type: string, user: UserAttributes, timeSetting: { title: string, value: number, mode: GAME_TYPE }) => {
-            console.log('User', user);
             const player: Player = { ...user, time: timeSetting.value };
             if (!socket.user) {
                 console.log('User not authenticated');
@@ -110,70 +109,48 @@ export const setUpSocket = (io: Server) => {
             socket.emit('exit_queue', 'exit successfully');
         });
 
-        socket.on('board_state_change', async ({ opponentId, roomId, fen }: { opponentId: string, roomId: string, fen: string }) => {
+        socket.on('board_state_change', async ({ opponentId, roomId, fen, newTimeLeft, newMove }: { opponentId: string, roomId: string, fen: string, newTimeLeft: number, newMove: MoveAttributes }) => {
             if (!socket.user) {
-                console.log('Not authenticated');
-                return;
+                throw new Error('Not authenticated');
             }
             const opponentSocketId = userIdToSocketIdMap.get(opponentId);
+            const currentUserSocketId = userIdToSocketIdMap.get(socket.user.id)!;
             if (!opponentSocketId) {
-                console.log('Incorrect opponent');
-                return;
+                throw new Error('Incorrect opponent');
             }
+            const t = await sequelize.transaction();
+            const game = await Game.findByPk(roomId);
+
+            if (!game) throw new Error("Game not found");
             try {
-                await Game.update({ fen: fen }, { where: { id: roomId } });
-                io.to(opponentSocketId).emit('board_state_change', fen);
+                if (socket.user.id === game.player1Id) {
+                    const newPlayer1LastMoveTime = new Date();
+                    const [_, rows] = await Game.update({
+                        player1TimeLeft: newTimeLeft,
+                        player1LastMoveTime: newPlayer1LastMoveTime,
+                        fen: fen
+                    },
+                        { where: { id: roomId }, returning: true });
+                    await Move.create(newMove);
+                    await t.commit();
+                    console.log("This is response", rows[0].toJSON());
+                    io.to(opponentSocketId).emit('board_state_change', rows[0].toJSON());
+                    io.to(currentUserSocketId).emit('board_state_change', rows[0].toJSON());
+                } else {
+                    const newPlayer2LastMoveTime = new Date();
+                    const [_, rows] = await Game.update({
+                        player2TimeLeft: newTimeLeft,
+                        player2LastMoveTime: newPlayer2LastMoveTime,
+                        fen: fen
+                    }, { where: { id: roomId }, returning: true },);
+                    await Move.create(newMove);
+                    await t.commit();
+                    console.log("This is response", rows[0].toJSON());
+                    io.to(opponentSocketId).emit('board_state_change', rows[0].toJSON());
+                    io.to(currentUserSocketId).emit('board_state_change', rows[0].toJSON());
+                }
             } catch (error) {
                 console.log(error);
-            }
-
-
-        });
-
-        socket.on('game_time_update', async ({ newLeftTime, gameId, opponentId }: { newLeftTime: number, gameId: string, opponentId: string }) => {
-            if (!socket.user) {
-                console.log('User not authenticated');
-                return;
-            }
-            const response = await Game.findByPk(gameId, {
-                include: [
-                    {
-                        model: Move,
-                        as: 'moveHistory'
-                    },
-                    {
-                        model: models.User,
-                        as: 'player1',
-                        attributes: { exclude: ['password'] }
-                    },
-                    {
-                        model: models.User,
-                        as: 'player2',
-                        attributes: { exclude: ['password'] }
-                    }
-                ]
-            });
-            if (!response) {
-                console.log('Game not found');
-                return;
-            }
-            const player_1_socketId = userIdToSocketIdMap.get(socket.user.id);
-            const player_2_socketId = userIdToSocketIdMap.get(opponentId);
-            if (!player_1_socketId || !player_2_socketId) {
-                console.log('One of the players is not connected');
-                return;
-            }
-            if (socket.user.id === response.player1Id) {
-                const newPlayer1LastMoveTime = new Date();
-                const result = await response.update({ player1TimeLeft: newLeftTime, player1LastMoveTime: newPlayer1LastMoveTime });
-
-                io.to(player_1_socketId).emit('game_time_update', result);
-                io.to(player_2_socketId).emit('game_time_update', result);
-            } else {
-                const newPlayer2LastMoveTime = new Date();
-                const result = await response.update({ player2TimeLeft: newLeftTime, player2LastMoveTime: newPlayer2LastMoveTime });
-                io.to(player_1_socketId).emit('game_time_update', result);
-                io.to(player_2_socketId).emit('game_time_update', result);
             }
         });
 
@@ -227,14 +204,6 @@ export const setUpSocket = (io: Server) => {
                 console.log(error);
             }
 
-        });
-        socket.on('new_move_history', (opponentId: string) => {
-            const opponentSocketId = userIdToSocketIdMap.get(opponentId);
-            if (!opponentSocketId) {
-                console.log('no socketid');
-                return;
-            }
-            io.to(opponentSocketId).emit('new_move_history');
         });
 
     });
