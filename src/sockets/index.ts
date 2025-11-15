@@ -1,5 +1,6 @@
 import { Server, Socket } from "socket.io";
 import {
+    ChallengeAttributes,
     GAME_TYPE
     , MessageAttributes, MoveAttributes, Player, TokenAttributes, UserAttributes
 } from "../types/types";
@@ -24,16 +25,20 @@ declare module "socket.io" {
 }
 
 export const setUpSocket = (io: Server) => {
-    io.on('connect', (socket: Socket) => {
+    io.on('connect', async (socket: Socket) => {
 
         console.log('CLient connected');
         if (socket.user?.id) {
             userIdToSocketIdMap.set(socket.user.id, socket.id);
+            await User.update({ isOnline: true, onlineAt: new Date() }, { where: { id: socket.user.id } });
         }
 
-        socket.on('disconnect', () => {
+        socket.on('disconnect', async () => {
             console.log('Client disconnected:', socket.id);
-
+            if (socket.user?.id) {
+                userIdToSocketIdMap.set(socket.user.id, socket.id);
+                await User.update({ isOnline: false, onlineAt: new Date() }, { where: { id: socket.user.id } });
+            }
         });
         socket.on('join_queue', async (type: string, user: UserAttributes, timeSetting: { title: string, value: number, mode: GAME_TYPE }) => {
             const player: Player = { ...user, time: timeSetting.value };
@@ -204,6 +209,16 @@ export const setUpSocket = (io: Server) => {
                 console.log(error);
             }
 
+        });
+        socket.on('new_challenge', (challenge: ChallengeAttributes) => {
+            console.log('Challenge', challenge);
+            const receiverSocketId = userIdToSocketIdMap.get(challenge.receiverId);
+            console.log(userIdToSocketIdMap, 'map');
+            console.log('receive socket', receiverSocketId);
+            if (receiverSocketId) {
+                console.log('sending challenge');
+                io.to(receiverSocketId).emit('new_challenge', challenge);
+            }
         });
 
     });

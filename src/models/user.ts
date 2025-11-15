@@ -9,6 +9,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
     password!: string;
     status!: boolean;
     onlineAt!: Date;
+    isOnline!: boolean;
     createdAt?: string;
     updatedAt?: string;
     elo!: number;
@@ -25,6 +26,7 @@ User.init({
     blitzElo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },
     password: { type: DataTypes.TEXT, allowNull: false },
     status: { type: DataTypes.BOOLEAN, defaultValue: false },
+    isOnline: { type: DataTypes.BOOLEAN, defaultValue: false, allowNull: false },
     onlineAt: { type: DataTypes.DATE },
     isBot: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }
 },

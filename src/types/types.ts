@@ -8,6 +8,7 @@ export interface UserAttributes {
     username: string;
     password?: string;
     status?: boolean;
+    isOnline: boolean;
     onlineAt?: Date,
     createdAt?: string | undefined,
     updatedAt?: string | undefined,
@@ -185,4 +186,18 @@ export interface PuzzleMoveAttributes {
     lan: string,
     promotion?: string,
     puzzleId: string,
+}
+
+
+
+export interface ChallengeAttributes {
+    id?: string,
+    senderId: string,
+    receiverId: string,
+    status: INVITATION_STATUS,
+    gameType: GAME_TYPE,
+    playerTime: number,
+    isSenderPlayer1: boolean,
+    createdAt?: string,
+    updatedAt?: string,
 }

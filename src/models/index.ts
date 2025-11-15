@@ -1,3 +1,4 @@
+import Challenge from "./challenges";
 import ChatBox from "./chatbox";
 import FriendShip from "./friendship";
 import Game from "./game";
@@ -45,6 +46,11 @@ Puzzle.belongsToMany(User, { through: UserPuzzles, as: 'puzzles', foreignKey: 'p
 User.belongsToMany(Puzzle, { through: UserPuzzles, as: 'users', foreignKey: 'userId' });
 
 Puzzle.hasMany(PuzzleMove, { foreignKey: 'puzzleId', as: 'validMoves' });
+
+User.hasMany(Challenge, { foreignKey: 'senderId', as: 'challenge_sender' });
+User.hasMany(Challenge, { foreignKey: 'receiverId', as: 'challenge_receiver' });
+Challenge.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
+Challenge.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver_id' });
 
 export default {
     User,
