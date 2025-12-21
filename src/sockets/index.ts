@@ -17,6 +17,7 @@ const userIdToSocketIdMap = new Map<string, string>();
 const rapidQueue = new MatchMakingQueue();
 const blitzQueue = new MatchMakingQueue();
 const rocketQueue = new MatchMakingQueue();
+const challengePageTracker = new Map<string, Set<string>>();
 
 declare module "socket.io" {
     interface Socket {
@@ -30,6 +31,7 @@ export const setUpSocket = (io: Server) => {
         console.log('CLient connected');
         if (socket.user?.id) {
             userIdToSocketIdMap.set(socket.user.id, socket.id);
+            console.log(socket.user.id, socket.id);
             await User.update({ isOnline: true, onlineAt: new Date() }, { where: { id: socket.user.id } });
         }
 
@@ -208,7 +210,6 @@ export const setUpSocket = (io: Server) => {
             } catch (error) {
                 console.log(error);
             }
-
         });
         socket.on('new_challenge', (challenge: ChallengeAttributes) => {
             console.log('Challenge', challenge);
@@ -218,6 +219,38 @@ export const setUpSocket = (io: Server) => {
             if (receiverSocketId) {
                 console.log('sending challenge');
                 io.to(receiverSocketId).emit('new_challenge', challenge);
+                io.to(receiverSocketId).emit('Testing', 'Xin chao');
+            }
+        });
+
+        socket.on('waiting_challenge', async (challenge: ChallengeAttributes) => {
+            if (!socket.user) {
+                console.log('Not authenticated');
+                return;
+            }
+            const userId = socket.user.id;
+            console.log(challenge);
+            if (userId == challenge.senderId || userId == challenge.receiverId) {
+                if (!challengePageTracker.has(challenge.id!)) {
+                    challengePageTracker.set(challenge.id!, new Set());
+                }
+                challengePageTracker.get(challenge.id!)?.add(userId);
+                if (challengePageTracker.get(challenge.id!)?.size == 2) {
+                    const whitePlayerId = challenge.isSenderPlayer1 ? challenge.senderId : challenge.receiverId;
+                    const blackPlayerId = challenge.isSenderPlayer1 ? challenge.receiverId : challenge.senderId;
+                    const player1SocketId = userIdToSocketIdMap.get(whitePlayerId)!;
+                    const player2SocketId = userIdToSocketIdMap.get(blackPlayerId)!;
+                    challengePageTracker.delete(challenge.id!);
+                    const response = await Game.create({
+                        player1Id: whitePlayerId,
+                        player2Id: blackPlayerId,
+                        player1TimeLeft: challenge.playerTime,
+                        player2TimeLeft: challenge.playerTime,
+                        gameType: challenge.gameType
+                    });
+                    io.to(player1SocketId).emit('match_found', { opponent: blackPlayerId, roomId: response.id, type: challenge.gameType });
+                    io.to(player2SocketId).emit('match_found', { opponent: whitePlayerId, roomId: response.id, type: challenge.gameType });
+                }
             }
         });
 
