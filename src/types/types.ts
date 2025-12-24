@@ -71,6 +71,7 @@ export interface GameAttributes {
     gameType: GAME_TYPE,
     gameStatus: GAME_STATUS,
     isBotGame?: boolean
+    latestScore: number,
 }
 
 export interface MoveAttributes {
@@ -87,6 +88,7 @@ export interface MoveAttributes {
     promotion?: string,
     playerTimeLeft: number,
     moverId: string
+    moveScore: number
 }
 
 export enum INVITATION_STATUS {

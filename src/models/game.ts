@@ -5,7 +5,7 @@ import { GAME_STATUS, GAME_TYPE, GameAttributes } from "../types/types";
 type GameCreationAttributes = Optional<GameAttributes,
     'id' | 'createdAt' | 'endedAt' | 'updatedAt' | 'winnerId' | 'fen' | 'player1LastMoveTime' |
     'player2LastMoveTime' | 'player1TimeLeft' | 'player2TimeLeft' | 'gameType' | 'isDraw' | 'loserId' | 'gameStatus'
-    | 'isBotGame'
+    | 'isBotGame' | 'latestScore'
 >;
 class Game extends Model<GameAttributes, GameCreationAttributes> implements GameAttributes {
     id!: string;
@@ -25,6 +25,7 @@ class Game extends Model<GameAttributes, GameCreationAttributes> implements Game
     player2TimeLeft!: number;
     gameStatus!: GAME_STATUS;
     isBotGame!: boolean;
+    latestScore!: number;
 }
 Game.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
@@ -42,6 +43,7 @@ Game.init({
     gameType: { type: DataTypes.ENUM('Rapid', 'Blitz', 'Rocket'), allowNull: false, defaultValue: 'Rapid' },
     gameStatus: { type: DataTypes.ENUM('finished, playing'), allowNull: false, defaultValue: 'playing' },
     isBotGame: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+    latestScore: { type: DataTypes.FLOAT, allowNull: false, defaultValue: 0 }
 },
     {
         sequelize,

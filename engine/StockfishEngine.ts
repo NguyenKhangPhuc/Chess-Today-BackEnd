@@ -45,6 +45,7 @@ export class StockfishEngine {
                     }
                     if (line.startsWith('bestmove')) {
                         bestMove = line.split(' ')[1];
+                        score = this.normalizeScore(score);
                         resolve({ bestMove, score });
                     }
                 }
@@ -69,11 +70,24 @@ export class StockfishEngine {
                         score = this.parseScore(line);
                     }
                     if (line.startsWith('bestmove')) {
+                        score = this.normalizeScore(score);
                         resolve({ score });
                     }
                 }
             });
         });
+    }
+
+    normalizeScore(score: EngineScore | null): EngineScore | null {
+        if (score) {
+            if (score.type != 'mate') {
+                score.value = score.value / 100;
+            } else {
+                score.value = Infinity;
+            }
+            score.value = Math.max(-5, Math.min(5, score.value));
+        }
+        return score;
     }
 
     stop() {

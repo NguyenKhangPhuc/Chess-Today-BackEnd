@@ -2,7 +2,7 @@ import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
 import { MoveAttributes } from "../types/types";
 
-type MoveCreationAttributes = Optional<MoveAttributes, 'id'>;
+type MoveCreationAttributes = Optional<MoveAttributes, 'id' | 'moveScore'>;
 class Move extends Model<MoveAttributes, MoveCreationAttributes> implements MoveAttributes {
     id!: string;
     gameId!: string;
@@ -17,6 +17,7 @@ class Move extends Model<MoveAttributes, MoveCreationAttributes> implements Move
     promotion?: string | undefined;
     playerTimeLeft!: number;
     moverId!: string;
+    moveScore!: number;
 }
 Move.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
@@ -31,7 +32,8 @@ Move.init({
     lan: { type: DataTypes.TEXT, allowNull: false },
     promotion: { type: DataTypes.TEXT, allowNull: true },
     playerTimeLeft: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 600 },
-    moverId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false }
+    moverId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
+    moveScore: { type: DataTypes.FLOAT, allowNull: false, defaultValue: 0 }
 }, {
     sequelize,
     underscored: true,
