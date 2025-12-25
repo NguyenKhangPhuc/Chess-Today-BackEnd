@@ -4,7 +4,7 @@ import { JWT_SECRET } from "./config";
 import models from "../models";
 import { CustomError, TokenAttributes, } from "../types/types";
 import { Socket } from "socket.io";
-
+import * as cookie from 'cookie';
 type AuthCookies = {
     access_token?: string;
 };
@@ -24,7 +24,6 @@ declare module "socket.io" {
 export const tokenExtractor: RequestHandler = async (req, res, next) => {
     const cookies = req.cookies as AuthCookies;
     const token = cookies.access_token;
-    console.log('This is token from REST', token);
     if (token) {
         const decodedToken = jwt.verify(token, JWT_SECRET) as TokenAttributes;
         if (decodedToken) {
@@ -45,8 +44,15 @@ export const tokenExtractor: RequestHandler = async (req, res, next) => {
 };
 
 export const socketTokenExtractor = async (socket: Socket, next: (err?: Error) => void) => {
-    const token = socket.handshake.auth.token as string | null;
-    console.log('token', token);
+    const cookieHeader = socket.request.headers.cookie;
+    console.log('Socket cookie', cookieHeader);
+    if (!cookieHeader) {
+        return next(new Error('No cookie sent'));
+    }
+
+    const cookies = cookie.parse(cookieHeader);
+    console.log('This is token from Socket', cookie);
+    const token = cookies['access_token'];
     if (token) {
         const decodedToken = jwt.verify(token, JWT_SECRET) as TokenAttributes;
         if (decodedToken) {

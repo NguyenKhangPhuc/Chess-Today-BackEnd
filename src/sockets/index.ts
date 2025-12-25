@@ -28,7 +28,7 @@ declare module "socket.io" {
 export const setUpSocket = (io: Server) => {
     io.on('connect', async (socket: Socket) => {
 
-        console.log('CLient connected');
+        console.log("User connected", socket.id);
         if (socket.user?.id) {
             userIdToSocketIdMap.set(socket.user.id, socket.id);
             console.log(socket.user.id, socket.id);
@@ -169,6 +169,7 @@ export const setUpSocket = (io: Server) => {
         });
 
         socket.on('new_message', async (message: MessageAttributes) => {
+            console.log('Receive new_message', socket.user);
             if (!socket.user) {
                 console.log('Not authenticated');
                 return;
