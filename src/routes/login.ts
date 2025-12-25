@@ -30,7 +30,15 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         res.status(500).json({ error: 'Token generation failed' });
         return;
     }
-    res.status(200).json({ token: token });
+    res.cookie('access_token', token, {
+        httpOnly: true,
+        secure: true,
+        sameSite: 'none',
+        path: '/',
+
+    });
+    console.log('Cookie set on response headers:', res.getHeader('Set-Cookie'));
+    res.status(200).json({ message: 'Login sucessfully' });
     return;
 });
 

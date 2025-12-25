@@ -66,6 +66,7 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
 });
 
 userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
+    console.log("This is userid", req.user?.id);
     const response = await models.User.findByPk(req.user?.id, {
         attributes: { exclude: ['password'] },
         include: [
@@ -153,6 +154,15 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
         return;
     }
     res.status(200).json(response);
+});
+
+userRouter.get('/check', tokenExtractor, (req: Request, res: Response) => {
+    if (req.user?.id) {
+        res.status(200).json({ message: 'verified' });
+    } else {
+        res.status(401).json({ error: 'Not authenticated' });
+    }
+    return;
 });
 
 userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unknown, { gameType: GAME_TYPE, userElo: number }>, res: Response) => {

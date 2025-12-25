@@ -2,6 +2,7 @@
 require('express-async-errors');
 import cors from 'cors';
 import express from 'express';
+import cookieParser from 'cookie-parser';
 import analyzeRouter from './routes/analyze';
 import signUpRouter from './routes/signup';
 import { connectToDB } from './utils/db';
@@ -22,11 +23,17 @@ import puzzleRouter from './routes/puzzles';
 import puzzleMovesRouter from './routes/puzzleMoves';
 import userPuzzlesRouter from './routes/userPuzzles';
 import challengeRouter from './routes/challenges';
+import logoutRouter from './routes/logout';
 const app = express();
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 const server = http.createServer(app);
+
+app.use(cookieParser());
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 
 const io = new Server(server, {
     cors: {
@@ -74,6 +81,7 @@ app.use('/api/puzzles', puzzleRouter);
 app.use('/api/puzzle-moves', puzzleMovesRouter);
 app.use('/api/user-puzzle', userPuzzlesRouter);
 app.use('/api/challenge', challengeRouter);
+app.use('/api/logout', logoutRouter);
 
 app.use(errorHandler);
 app.use(unknownEndpoint);

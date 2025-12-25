@@ -5,7 +5,9 @@ import models from "../models";
 import { CustomError, TokenAttributes, } from "../types/types";
 import { Socket } from "socket.io";
 
-
+type AuthCookies = {
+    access_token?: string;
+};
 
 declare module "express-serve-static-core" {
     interface Request {
@@ -20,12 +22,11 @@ declare module "socket.io" {
 }
 
 export const tokenExtractor: RequestHandler = async (req, res, next) => {
-    const token = req.headers.authorization;
+    const cookies = req.cookies as AuthCookies;
+    const token = cookies.access_token;
     console.log('This is token from REST', token);
-    if (token && token.startsWith('Bearer ')) {
-        const receivedToken = token.substring(7);
-        console.log('Verifying secret', JWT_SECRET);
-        const decodedToken = jwt.verify(receivedToken, JWT_SECRET) as TokenAttributes;
+    if (token) {
+        const decodedToken = jwt.verify(token, JWT_SECRET) as TokenAttributes;
         if (decodedToken) {
             const foundUser = await models.User.findByPk(decodedToken.id);
             if (foundUser) {
@@ -52,7 +53,6 @@ export const socketTokenExtractor = async (socket: Socket, next: (err?: Error) =
             const foundUser = await models.User.findByPk(decodedToken.id);
             if (foundUser) {
                 socket.user = foundUser;
-
             }
         } else {
             next(new Error('JsonWebTokenError'));
