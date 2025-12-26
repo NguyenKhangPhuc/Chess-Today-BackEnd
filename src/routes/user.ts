@@ -158,7 +158,7 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
 
 userRouter.get('/check', tokenExtractor, (req: Request, res: Response) => {
     if (req.user?.id) {
-        res.status(200).json({ message: 'verified' });
+        res.status(200).json({ userInfo: req.user });
     } else {
         res.status(401).json({ error: 'Not authenticated' });
     }

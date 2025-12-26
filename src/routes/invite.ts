@@ -10,6 +10,7 @@ const inviteRouter = express.Router();
 
 inviteRouter.get('/sender/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     const { limit, after, before } = req.query;
+    console.log("Sent Invitation ", req.query);
     let where = {};
     if (after) {
         where = {
@@ -27,6 +28,7 @@ inviteRouter.get('/sender/user/:id', tokenExtractor, async (req: Request<{ id: s
             ]
         };
     }
+    console.log(where);
     const response = await Invitation.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
             senderId: req.params.id
@@ -52,6 +54,7 @@ inviteRouter.get('/sender/user/:id', tokenExtractor, async (req: Request<{ id: s
 
 inviteRouter.get('/receiver/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     const { limit, after, before } = req.query;
+    console.log("Sent Invitation ", req.query);
     let where = {};
     if (after) {
         where = {
@@ -69,6 +72,7 @@ inviteRouter.get('/receiver/user/:id', tokenExtractor, async (req: Request<{ id:
             ]
         };
     }
+    console.log(where);
     const response = await Invitation.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
             receiverId: req.params.id

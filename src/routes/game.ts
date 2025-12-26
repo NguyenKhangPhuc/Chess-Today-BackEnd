@@ -265,6 +265,10 @@ gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>,
         res.status(401).json({ error: 'Game not found' });
         return;
     }
+    if (game.gameStatus == GAME_STATUS.FINISHED) {
+        res.status(200).json({ message: 'Game already finished' });
+        return;
+    }
     const response = await game.update({ isDraw: true, gameStatus: GAME_STATUS.FINISHED });
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -281,6 +285,10 @@ gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id:
     const game = await Game.findByPk(req.params.id);
     if (!game) {
         res.status(401).json({ error: 'Game not found' });
+        return;
+    }
+    if (game.gameStatus == GAME_STATUS.FINISHED) {
+        res.status(200).json({ message: 'Game already finished' });
         return;
     }
     console.log('This is winner and loser', req.body.winnerId, req.body.loserId);

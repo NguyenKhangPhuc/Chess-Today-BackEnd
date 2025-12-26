@@ -29,7 +29,7 @@ export const tokenExtractor: RequestHandler = async (req, res, next) => {
         if (decodedToken) {
             const foundUser = await models.User.findByPk(decodedToken.id);
             if (foundUser) {
-                req.user = foundUser;
+                req.user = decodedToken;
 
             }
         } else {
@@ -58,7 +58,7 @@ export const socketTokenExtractor = async (socket: Socket, next: (err?: Error) =
         if (decodedToken) {
             const foundUser = await models.User.findByPk(decodedToken.id);
             if (foundUser) {
-                socket.user = foundUser;
+                socket.user = decodedToken;
             }
         } else {
             next(new Error('JsonWebTokenError'));
