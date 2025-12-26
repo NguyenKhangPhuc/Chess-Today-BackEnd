@@ -207,11 +207,25 @@ export const setUpSocket = (io: Server) => {
                     console.log('Missing opponentSocketId');
                     return;
                 }
+                io.to(opponentSocketId).emit('new_messages_outside', socket.user);
                 io.to(opponentSocketId).emit('new_message', response, chatBox);
             } catch (error) {
                 console.log(error);
             }
         });
+
+        socket.on('new_invitations', (payload: { sender: TokenAttributes, receiverId: string }) => {
+            const { sender, receiverId } = payload;
+
+            console.log('New invitation:', sender, receiverId);
+            const receiverSocketId = userIdToSocketIdMap.get(receiverId);
+            if (receiverSocketId) {
+                io.to(receiverSocketId).emit('new_invitations', sender);
+            }
+        });
+
+
+
         socket.on('new_challenge', (challenge: ChallengeAttributes) => {
             console.log('Challenge', challenge);
             const receiverSocketId = userIdToSocketIdMap.get(challenge.receiverId);
