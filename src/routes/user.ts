@@ -1,11 +1,9 @@
 import express, { Request, Response } from 'express';
 import { tokenExtractor } from '../utils/middleware';
 import models from '../models';
-import Game from '../models/game';
 import { Op } from 'sequelize';
 import User from '../models/user';
 import { GAME_TYPE, UserAttributes } from '../types/types';
-import Move from '../models/move';
 import { PaginationCursor } from '../helpers/pagination';
 const userRouter = express.Router();
 userRouter.get('/check', tokenExtractor, (req: Request, res: Response) => {
@@ -78,28 +76,6 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
         attributes: { exclude: ['password'] },
         include: [
             {
-                model: models.Invitation,
-                as: 'sentInvitations',
-                include: [
-                    {
-                        model: models.User,
-                        as: 'receiver',
-                        attributes: { exclude: ['password'] }
-                    }
-                ]
-            },
-            {
-                model: models.Invitation,
-                as: 'receivedInvitations',
-                include: [
-                    {
-                        model: models.User,
-                        as: 'sender',
-                        attributes: { exclude: ['password'] }
-                    }
-                ]
-            },
-            {
                 model: models.User,
                 as: 'friends',
                 through: {
@@ -115,45 +91,6 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
                 },
                 attributes: { exclude: ['password'] }
             },
-            {
-                model: Game,
-                as: 'gameAsPlayer1',
-                include: [
-                    {
-                        model: User,
-                        as: 'player1'
-                    },
-                    {
-                        model: User,
-                        as: 'player2',
-                    },
-                    {
-                        model: Move,
-                        as: 'moveHistory',
-                        attributes: ['id']
-                    }
-                ]
-            },
-            {
-                model: Game,
-                as: 'gameAsPlayer2',
-                include: [
-                    {
-                        model: User,
-                        as: 'player1'
-                    },
-                    {
-                        model: User,
-                        as: 'player2',
-                    },
-                    {
-                        model: Move,
-                        as: 'moveHistory',
-                        attributes: ['id']
-                    }
-
-                ]
-            }
         ]
     });
     if (!response) {
@@ -167,28 +104,7 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
     const response = await models.User.findByPk(req.params?.id, {
         attributes: { exclude: ['password'] },
         include: [
-            {
-                model: models.Invitation,
-                as: 'sentInvitations',
-                include: [
-                    {
-                        model: models.User,
-                        as: 'receiver',
-                        attributes: { exclude: ['password'] }
-                    }
-                ]
-            },
-            {
-                model: models.Invitation,
-                as: 'receivedInvitations',
-                include: [
-                    {
-                        model: models.User,
-                        as: 'sender',
-                        attributes: { exclude: ['password'] }
-                    }
-                ]
-            },
+
             {
                 model: models.User,
                 as: 'friends',
@@ -205,45 +121,6 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
                 },
                 attributes: { exclude: ['password'] }
             },
-            {
-                model: Game,
-                as: 'gameAsPlayer1',
-                include: [
-                    {
-                        model: User,
-                        as: 'player1'
-                    },
-                    {
-                        model: User,
-                        as: 'player2',
-                    },
-                    {
-                        model: Move,
-                        as: 'moveHistory',
-                        attributes: ['id']
-                    }
-                ]
-            },
-            {
-                model: Game,
-                as: 'gameAsPlayer2',
-                include: [
-                    {
-                        model: User,
-                        as: 'player1'
-                    },
-                    {
-                        model: User,
-                        as: 'player2',
-                    },
-                    {
-                        model: Move,
-                        as: 'moveHistory',
-                        attributes: ['id']
-                    }
-
-                ]
-            }
         ]
     });
     if (!response) {
