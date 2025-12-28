@@ -45,59 +45,6 @@ gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { 
     return;
 });
 
-gameRouter.put('/fen/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { fen: string }>, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
-    const game = await Game.findByPk(req.params.id, {
-        include: [
-            {
-                model: Move,
-                as: 'moveHistory'
-            },
-            {
-                model: models.User,
-                as: 'player1',
-                attributes: { exclude: ['password'] }
-            },
-            {
-                model: models.User,
-                as: 'player2',
-                attributes: { exclude: ['password'] }
-            }
-        ]
-    });
-    if (!game) {
-        res.status(401).json({ error: 'Game not found' });
-        return;
-    }
-    await game.update({
-        fen: req.body.fen
-    });
-
-    res.status(200).json(game);
-    return;
-});
-
-gameRouter.get('/', tokenExtractor, async (_: Request, res: Response) => {
-    const response = await Game.findAll({
-        include: [
-            {
-                model: Move,
-                as: 'moveHistory'
-            },
-        ]
-
-    });
-
-    if (!response) {
-        res.status(500).json({ error: 'Internal Server Error' });
-        return;
-    }
-    res.status(200).json(response);
-    return;
-});
 
 gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     const { after, before, limit } = req.query;
@@ -146,17 +93,18 @@ gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>,
         include: [
             {
                 model: Move,
-                as: 'moveHistory'
+                as: 'moveHistory',
+                attributes: ['id']
             },
             {
                 model: models.User,
                 as: 'player1',
-                attributes: { exclude: ['password'] }
+                attributes: ['id', 'name', 'username']
             },
             {
                 model: models.User,
                 as: 'player2',
-                attributes: { exclude: ['password'] }
+                attributes: ['id', 'name', 'username']
             }
         ]
     });
@@ -207,53 +155,6 @@ gameRouter.post('/check-ongoing-game', tokenExtractor, async (_: Request, res: R
     res.status(200).json({ message: 'No ongoing game' });
 });
 
-gameRouter.put('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { newTimeLeft: number }>, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
-    const response = await Game.findByPk(req.params.id, {
-        include: [
-            {
-                model: Move,
-                as: 'moveHistory'
-            },
-            {
-                model: models.User,
-                as: 'player1',
-                attributes: { exclude: ['password'] }
-            },
-            {
-                model: models.User,
-                as: 'player2',
-                attributes: { exclude: ['password'] }
-            }
-        ]
-    });
-    if (!response) {
-        res.status(401).json({ message: 'Game not found' });
-        return;
-    }
-    if (req.user.id === response.player1Id) {
-        const newPlayer1LastMoveTime = new Date();
-        const result = await response.update({ player1TimeLeft: req.body.newTimeLeft, player1LastMoveTime: newPlayer1LastMoveTime });
-        if (!result) {
-            res.status(500).json({ error: 'Internal Server Error' });
-            return;
-        }
-        res.status(200).json({ message: 'Update successfully', result });
-        return;
-    } else {
-        const newPlayer2LastMoveTime = new Date();
-        const result = await response.update({ player2TimeLeft: req.body.newTimeLeft, player2LastMoveTime: newPlayer2LastMoveTime });
-        if (!result) {
-            res.status(500).json({ error: 'Internal Server Error' });
-            return;
-        }
-        res.status(200).json({ message: 'Update successfully', result });
-        return;
-    }
-});
 
 gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     if (!req.user) {
