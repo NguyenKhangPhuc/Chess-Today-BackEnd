@@ -105,7 +105,15 @@ inviteRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, Inv
     }
     const { receiverId } = req.body;
     const senderId = req.user?.id;
-    const response = await models.Invitation.create({ receiverId, senderId });
+    const [userA, userB] =
+        senderId < receiverId!
+            ? [senderId, receiverId]
+            : [receiverId, senderId];
+    if (!userA || !userB) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
+    const response = await models.Invitation.create({ receiverId, senderId, userA, userB });
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;

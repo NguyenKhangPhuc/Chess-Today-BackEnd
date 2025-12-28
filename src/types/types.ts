@@ -39,6 +39,8 @@ export interface InvitationAttributes {
     status: INVITATION_STATUS,
     createdAt?: string,
     updatedAt?: string,
+    userA: string,
+    userB: string
 }
 
 export interface FriendAttributes {

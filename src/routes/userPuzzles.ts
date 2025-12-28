@@ -22,7 +22,7 @@ userPuzzlesRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown
         status: PUZZLE_STATUS.SOLVED,
     };
     const foundRelation = await UserPuzzles.findOne({
-        where: { puzzleId: req.body.puzzleId }
+        where: { puzzleId: req.body.puzzleId, userId: req.body.userId }
     });
 
     if (foundRelation) {

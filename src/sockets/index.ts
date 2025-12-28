@@ -118,17 +118,23 @@ export const setUpSocket = (io: Server) => {
 
         socket.on('board_state_change', async ({ opponentId, roomId, fen, newTimeLeft, newMove }: { opponentId: string, roomId: string, fen: string, newTimeLeft: number, newMove: MoveAttributes }) => {
             if (!socket.user) {
-                throw new Error('Not authenticated');
+                console.log('Not authenticated');
+                return;
             }
             const opponentSocketId = userIdToSocketIdMap.get(opponentId);
             const currentUserSocketId = userIdToSocketIdMap.get(socket.user.id)!;
             if (!opponentSocketId) {
-                throw new Error('Incorrect opponent');
+                console.log('Incorrect opponent');
+                return;
             }
             const t = await sequelize.transaction();
             const game = await Game.findByPk(roomId);
 
             if (!game) throw new Error("Game not found");
+            if (socket.user.id != game.player1Id && socket.user.id != game.player2Id) {
+                console.log("Incorrect player");
+                return;
+            };
             try {
                 if (socket.user.id === game.player1Id) {
                     const newPlayer1LastMoveTime = new Date();

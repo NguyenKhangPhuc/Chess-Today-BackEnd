@@ -10,12 +10,23 @@ class Invitation extends Model<InvitationAttributes, InvitationCreationAttribute
     status!: INVITATION_STATUS;
     createdAt?: string;
     updatedAt?: string;
+    userA!: string;
+    userB!: string;
 }
 Invitation.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     senderId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
     receiverId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
-    status: { type: DataTypes.ENUM('pending', 'accepted', 'rejected'), defaultValue: 'pending' }
+    status: { type: DataTypes.ENUM('pending', 'accepted', 'rejected'), defaultValue: 'pending' },
+    userA: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
+    userB: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
+
 }, {
     sequelize,
     underscored: true,
