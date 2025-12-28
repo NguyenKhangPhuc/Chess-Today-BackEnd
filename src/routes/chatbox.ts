@@ -23,12 +23,12 @@ chatBoxRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
             {
                 model: User,
                 as: 'user1',
-                attributes: { exclude: ['password'] }
+                attributes: ['id', 'name', 'username']
             },
             {
                 model: User,
                 as: 'user2',
-                attributes: { exclude: ['password'] }
+                attributes: ['id', 'name', 'username']
             },
             {
                 model: Message,
@@ -49,6 +49,12 @@ chatBoxRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, Ch
         res.status(401).json({ error: 'Not authenticated' });
         return;
     }
+    const [userA, userB] =
+        req.body.user1Id < req.body.user2Id
+            ? [req.body.user1Id, req.body.user2Id]
+            : [req.body.user2Id, req.body.user1Id];
+    req.body.userA = userA;
+    req.body.userB = userB;
     const response = await ChatBox.create(req.body);
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });

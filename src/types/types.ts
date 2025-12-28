@@ -114,6 +114,8 @@ export interface ChatBoxAttributes {
     user2Id: string,
     createdAt?: Date,
     updatedAt?: Date,
+    userA: string,
+    userB: string,
 }
 
 export interface MessageAttributes {

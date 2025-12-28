@@ -9,11 +9,21 @@ class ChatBox extends Model<ChatBoxAttributes, ChatBoxCreationAttributes> implem
     user2Id!: string;
     createdAt!: Date;
     updatedAt!: Date;
+    userA!: string;
+    userB!: string;
 }
 ChatBox.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     user1Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'user_1_id', allowNull: false },
     user2Id: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, field: 'user_2_id', allowNull: false },
+    userA: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
+    userB: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
 }, {
     sequelize,
     underscored: true,

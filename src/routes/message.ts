@@ -19,4 +19,5 @@ messageRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, Me
     res.status(200).json(response);
     return;
 });
+
 export default messageRouter;
