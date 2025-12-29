@@ -59,7 +59,9 @@ class MatchMakingQueue {
 
     }
 
-    public findMatch(player: Player, playerElo: number, gameType: GAME_TYPE, delta: number, joinAt = Date.now()) {
+    public findMatch(player: Player, gameType: GAME_TYPE, delta: number, joinAt = Date.now()) {
+        const playerElo = this.getCorrectElo(player, gameType);
+        if (!playerElo) return;
         const minElo = playerElo - delta;
         const maxElo = playerElo + delta;
         let startIndex = 0;
@@ -111,6 +113,19 @@ class MatchMakingQueue {
             }
         }
         return bestMatch;
+    }
+
+    getCorrectElo(player: Player, gameType: GAME_TYPE) {
+        switch (gameType) {
+            case GAME_TYPE.BLITZ:
+                return player.blitzElo;
+            case GAME_TYPE.RAPID:
+                return player.elo;
+            case GAME_TYPE.ROCKET:
+                return player.rocketElo;
+            default:
+                return null;
+        }
     }
 }
 
