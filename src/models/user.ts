@@ -20,7 +20,7 @@ class User extends Model<UserAttributes, UserCreationAttributes> implements User
 User.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     name: { type: DataTypes.TEXT, allowNull: false },
-    username: { type: DataTypes.TEXT, allowNull: false, validate: { isEmail: { msg: 'Username must be an email' } } },
+    username: { type: DataTypes.TEXT, allowNull: false, validate: { isEmail: { msg: 'Username must be an email' } }, unique: true },
     elo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },
     rocketElo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },
     blitzElo: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 800 },

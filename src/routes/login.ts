@@ -4,18 +4,32 @@ import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../utils/config';
 import models from '../models';
 import Game from '../models/game';
+import argon2 from 'argon2';
 const loginRouter = express.Router();
 
 loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res: Response) => {
     const receivedUser = req.body;
+    if (!receivedUser.password) {
+        res.status(500).json({ error: 'Internal Server Error' });
+        return;
+    }
     const foundUser = await models.User.findOne({
         where: {
             username: receivedUser.username,
-            password: receivedUser.password
         }
     });
+
+
     if (foundUser == null) {
-        res.status(400).json({ message: 'Wrong credentials' });
+        res.status(400).json({ error: 'Wrong credentials' });
+        return;
+    }
+
+
+    const valid = await argon2.verify(foundUser.password, receivedUser.password);
+
+    if (!valid) {
+        res.status(400).json({ error: 'Wrong credentials' });
         return;
     }
 

@@ -5,6 +5,7 @@ import models from "../models";
 import { CustomError, TokenAttributes, } from "../types/types";
 import { Socket } from "socket.io";
 import * as cookie from 'cookie';
+import { UniqueConstraintError } from 'sequelize';
 type AuthCookies = {
     access_token?: string;
 };
@@ -83,17 +84,18 @@ export const errorHandler: ErrorRequestHandler = (error: CustomError, _, res, ne
     } else if (error.name === 'ValidationError') {
         res.status(400).json({ error: error.message });
         return;
-    } else if (error.name === 'MongoServerError' && error.message.includes('E11000 duplicate key error')) {
-        res.status(400).json({ error: 'expected `username` need to be unique' });
-        return;
     } else if (error.name === 'JsonWebTokenError' || error.message == 'JsonWebTokenError') {
         res.status(401).json({ error: "invalid token or missing token" });
         return;
     } else if (error.name === 'TokenExpiredError') {
         res.status(401).json({ error: 'token expired' });
         return;
-    } else {
-        res.status(500).json({ error, message: 'Unknown error' });
+    } else if (error instanceof UniqueConstraintError) {
+        res.status(400).json({ error: 'Username already exists' });
+        return;
+    }
+    else {
+        res.status(500).json({ error: 'Unknown error' });
     }
     next(error);
 };

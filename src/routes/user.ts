@@ -43,7 +43,8 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
         where = {
             [Op.and]: [
                 { createdAt: { [Op.lt]: after }, },
-                { id: { [Op.notIn]: [...excludeIds, req.user.id] } }
+                { id: { [Op.notIn]: [...excludeIds, req.user.id] } },
+                { isBot: false }
             ]
         };
     }
@@ -51,13 +52,15 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
         where = {
             [Op.and]: [
                 { createdAt: { [Op.gt]: before }, },
-                { id: { [Op.notIn]: [...excludeIds, req.user.id] } }
+                { id: { [Op.notIn]: [...excludeIds, req.user.id] } },
+                { isBot: false }
             ]
         };
     }
     const response = await models.User.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
-            id: { [Op.notIn]: [...excludeIds, req.user.id] }
+            id: { [Op.notIn]: [...excludeIds, req.user.id] },
+            isBot: false
         },
         limit: Number(limit) + 1,
         attributes: { exclude: ['password'] },
