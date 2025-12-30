@@ -33,10 +33,12 @@ moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveA
 // Route to find all move of a specific game
 moveRouter.get('/game/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
     // Find all the move with the given gameId
+    console.log(req.params.id, "Games move");
     const response = await Move.findAll({
         where: {
             gameId: req.params.id
         },
+        order: [['createdAt', 'ASC']],
         include: [
             {
                 model: User,

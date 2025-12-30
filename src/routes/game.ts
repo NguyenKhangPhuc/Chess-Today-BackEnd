@@ -181,7 +181,7 @@ gameRouter.post('/check-ongoing-game', tokenExtractor, async (req: Request, res:
     };
     const response = await Game.findOne({ where });
     if (response) {
-        res.status(409).json({ errorCode: "GAME_IN_PROGRESS", message: "Game is currently ongoing", game: response });
+        res.status(409).json({ errorCode: "GAME_IN_PROGRESS", error: "Game is currently ongoing", game: response });
         return;
     }
     res.status(200).json({ message: 'No ongoing game' });

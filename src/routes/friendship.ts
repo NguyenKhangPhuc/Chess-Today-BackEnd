@@ -79,6 +79,7 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
+    console.log(response);
     // Get the new next/prev cursor and the boolean value which show if there exists next/prev page.
     const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<FriendAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
     res.status(200).json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });

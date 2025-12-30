@@ -13,7 +13,7 @@ export function registerMatchMakingHandlers(io: Server, socket: Socket) {
         }
 
 
-        const bestMatch = gameQueue.matchMaking(player, timeSetting.mode);
+        const bestMatch = await gameQueue.matchMaking(player, timeSetting.mode);
 
         if (bestMatch) {
             const match = await gameService.createMatch(player.id, bestMatch.id, player.time, bestMatch.time, timeSetting.mode);

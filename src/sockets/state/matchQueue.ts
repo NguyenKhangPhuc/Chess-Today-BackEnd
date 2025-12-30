@@ -1,22 +1,29 @@
 import MatchMakingQueue from "../../matchmaking";
 import { GAME_TYPE, Player } from "../../types/types";
-
+import { Mutex } from "async-mutex";
 class MatchQueue {
     private rapidQueue = new MatchMakingQueue();
     private blitzQueue = new MatchMakingQueue();
     private rocketQueue = new MatchMakingQueue();
+    private mutex = new Mutex();
 
-    matchMaking(player: Player, gameType: GAME_TYPE) {
+    async matchMaking(player: Player, gameType: GAME_TYPE): Promise<Player | null> {
         const correctQueue = this.getCorrectQueue(gameType);
-        let bestMatch;
-        if (correctQueue) {
+        if (!correctQueue) return null;
+
+        let bestMatch: Player | undefined | null = null;
+
+        await this.mutex.runExclusive(() => {
             correctQueue.add(player, gameType);
+
             bestMatch = correctQueue.findMatch(player, gameType, 100);
+
             if (bestMatch) {
                 correctQueue.remove(player.id);
                 correctQueue.remove(bestMatch.id);
             }
-        }
+        });
+
         return bestMatch;
     }
 

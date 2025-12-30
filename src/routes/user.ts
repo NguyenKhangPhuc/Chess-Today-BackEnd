@@ -120,6 +120,7 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
 
 // Route to get the information of the specific user information based on their id through request params
 userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
+    console.log(req.params.id, "Params id");
     // Get the specific user information through the req params, including the friends
     const response = await models.User.findByPk(req.params?.id, {
         attributes: { exclude: ['password'] },
@@ -143,6 +144,7 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
             },
         ]
     });
+    console.log(response);
     if (!response) {
         res.status(500).json({ error: 'Internal server error' });
         return;
