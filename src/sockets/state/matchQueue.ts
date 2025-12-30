@@ -1,6 +1,7 @@
 import MatchMakingQueue from "../../matchmaking";
-import { GAME_TYPE, Player } from "../../types/types";
 import { Mutex } from "async-mutex";
+import { Player } from "../../types/user";
+import { GAME_TYPE } from "../../types/enum";
 class MatchQueue {
     private rapidQueue = new MatchMakingQueue();
     private blitzQueue = new MatchMakingQueue();

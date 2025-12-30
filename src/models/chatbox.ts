@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { ChatBoxAttributes } from "../types/types";
+import { ChatBoxAttributes } from "../types/chatbox";
 
 type ChatBoxCreationAttributes = Optional<ChatBoxAttributes, 'id'>;
 class ChatBox extends Model<ChatBoxAttributes, ChatBoxCreationAttributes> implements ChatBoxAttributes {

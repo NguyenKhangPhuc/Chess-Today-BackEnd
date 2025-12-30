@@ -1,15 +1,14 @@
 import { Server, Socket } from "socket.io";
-import { ChallengeAttributes } from "../../types/types";
 import { onlineUsers } from "../state/onlineUsers";
 import { challengePageController } from "../state/challengePageController";
 import { gameService } from "../service/gameService";
 import { challengeEmitter } from "../emitter/challenge.emitter";
+import { ChallengeAttributes } from "../../types/challenge";
 
 export function registerChallengeHandlers(io: Server, socket: Socket) {
     // Route handle challenge announcement
     socket.on('new_challenge', (challenge: ChallengeAttributes) => {
         // Get the challenge receiverSocketId and emit to them about new challenge
-        console.log('Challenge', challenge);
         const receiverSocketId = onlineUsers.getSocketId(challenge.receiverId);
         if (receiverSocketId) {
             console.log('sending challenge');
@@ -23,7 +22,6 @@ export function registerChallengeHandlers(io: Server, socket: Socket) {
             return;
         }
         const userId = socket.user.id;
-        console.log(challenge);
         // Check if the user who enter this page is either challenge sender or receiver
         if (userId == challenge.senderId || userId == challenge.receiverId) {
             // Store the userId who enter the page
@@ -44,5 +42,14 @@ export function registerChallengeHandlers(io: Server, socket: Socket) {
                 challengeEmitter.emitChallenge(io, player1SocketId, player2SocketId, response.id, whitePlayerId, blackPlayerId, challenge.gameType);
             }
         }
+    });
+
+    socket.on('leave_challenge', (payload: { challengeId: string }) => {
+        if (!socket.user) {
+            console.log('Not authenticated');
+            return;
+        }
+        console.log('user leave page');
+        challengePageController.deleteUserFromPage(payload.challengeId, socket.user.id);
     });
 }

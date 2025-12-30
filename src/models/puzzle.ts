@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { PUZZLE_LEVEL, PuzzleAttributes } from "../types/types";
+import { PUZZLE_LEVEL } from "../types/enum";
+import { PuzzleAttributes } from "../types/puzzles";
 
 type PuzzleCreationAttributes = Optional<PuzzleAttributes, 'id'>;
 class Puzzle extends Model<PuzzleAttributes, PuzzleCreationAttributes> implements PuzzleAttributes {

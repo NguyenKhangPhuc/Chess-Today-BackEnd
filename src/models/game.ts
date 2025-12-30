@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional, Sequelize } from "sequelize";
 import { sequelize } from "../utils/db";
-import { GAME_STATUS, GAME_TYPE, GameAttributes } from "../types/types";
+import { GAME_TYPE, GAME_STATUS } from "../types/enum";
+import { GameAttributes } from "../types/game";
 
 type GameCreationAttributes = Optional<GameAttributes,
     'id' | 'createdAt' | 'endedAt' | 'updatedAt' | 'winnerId' | 'fen' | 'player1LastMoveTime' |

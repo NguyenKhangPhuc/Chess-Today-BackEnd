@@ -2,7 +2,8 @@ import express from 'express';
 import { Response, Request } from 'express';
 import { tokenExtractor } from '../utils/middleware';
 import UserPuzzles from '../models/userPuzzles';
-import { PUZZLE_STATUS, UserPuzzleRelationAttribute } from '../types/types';
+import { UserPuzzleRelationAttribute } from '../types/userPuzzles';
+import { PUZZLE_STATUS } from '../types/enum';
 
 const userPuzzlesRouter = express.Router();
 

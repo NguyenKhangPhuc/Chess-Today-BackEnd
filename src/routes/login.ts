@@ -1,9 +1,10 @@
 import express, { Request, Response } from 'express';
-import { TokenAttributes, UserAttributes } from '../types/types';
 import jwt from 'jsonwebtoken';
 import { JWT_SECRET } from '../utils/config';
 import models from '../models';
 import argon2 from 'argon2';
+import { UserAttributes } from '../types/user';
+import { TokenAttributes } from '../types/types';
 const loginRouter = express.Router();
 
 // Route to login

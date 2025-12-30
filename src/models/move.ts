@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { MoveAttributes } from "../types/types";
+import { MoveAttributes } from "../types/move";
 
 type MoveCreationAttributes = Optional<MoveAttributes, 'id' | 'moveScore'>;
 class Move extends Model<MoveAttributes, MoveCreationAttributes> implements MoveAttributes {

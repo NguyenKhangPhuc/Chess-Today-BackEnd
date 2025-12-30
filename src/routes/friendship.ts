@@ -1,11 +1,11 @@
 import express, { Request, Response } from 'express';
-import { FriendAttributes } from '../types/types';
 import models from '../models';
 import { tokenExtractor } from '../utils/middleware';
 import { Op } from 'sequelize';
 import FriendShip from '../models/friendship';
 import User from '../models/user';
 import { PaginationCursor } from '../helpers/pagination';
+import { FriendAttributes } from '../types/friend';
 
 const friendshipRouter = express.Router();
 

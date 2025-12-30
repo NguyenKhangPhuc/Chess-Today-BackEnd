@@ -1,7 +1,5 @@
-
-
-import { GAME_TYPE, Player } from "../types/types";
-
+import { GAME_TYPE } from "../types/enum";
+import { Player } from "../types/user";
 
 class MatchMakingQueue {
     public playerQueue: Array<Player> = [];

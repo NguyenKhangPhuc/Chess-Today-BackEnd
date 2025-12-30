@@ -3,8 +3,9 @@ import { tokenExtractor } from '../utils/middleware';
 import models from '../models';
 import { Op } from 'sequelize';
 import User from '../models/user';
-import { GAME_TYPE, UserAttributes } from '../types/types';
 import { PaginationCursor } from '../helpers/pagination';
+import { UserAttributes } from '../types/user';
+import { GAME_TYPE } from '../types/enum';
 const userRouter = express.Router();
 
 // Route to check if the user is verified and return

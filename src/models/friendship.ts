@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { FriendAttributes } from "../types/types";
+import { FriendAttributes } from "../types/friend";
+
 
 type FriendShipCreationAttributes = Optional<FriendAttributes, 'id'>;
 class FriendShip extends Model<FriendAttributes, FriendShipCreationAttributes> implements FriendAttributes {

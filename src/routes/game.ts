@@ -1,5 +1,4 @@
 import express, { Request, Response } from 'express';
-import { GAME_STATUS, GameAttributes } from '../types/types';
 import Game from '../models/game';
 import Move from '../models/move';
 import models from '../models';
@@ -7,6 +6,8 @@ import { tokenExtractor } from '../utils/middleware';
 import { Op } from 'sequelize';
 import { PaginationCursor } from '../helpers/pagination';
 import User from '../models/user';
+import { GameAttributes } from '../types/game';
+import { GAME_STATUS } from '../types/enum';
 
 const gameRouter = express.Router();
 

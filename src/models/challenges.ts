@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { ChallengeAttributes, GAME_TYPE, INVITATION_STATUS } from "../types/types";
+import { ChallengeAttributes } from "../types/challenge";
+import { INVITATION_STATUS, GAME_TYPE } from "../types/enum";
 type ChallengeCreationAttribute = Optional<ChallengeAttributes, 'id' | 'status' | 'createdAt' | 'updatedAt'>;
 class Challenge extends Model<ChallengeAttributes, ChallengeCreationAttribute> implements ChallengeAttributes {
     id!: string;

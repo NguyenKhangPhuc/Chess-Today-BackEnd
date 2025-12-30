@@ -1,8 +1,9 @@
 import { Server, Socket } from "socket.io";
-import { GAME_TYPE, Player, UserAttributes } from "../../types/types";
 import { gameQueue } from "../state/matchQueue";
 import { gameService } from "../service/gameService";
 import { matchMakingEmitter } from "../emitter/matchmaking.emitter";
+import { GAME_TYPE } from "../../types/enum";
+import { Player, UserAttributes } from "../../types/user";
 
 export function registerMatchMakingHandlers(io: Server, socket: Socket) {
     // When user join the queue to have match making

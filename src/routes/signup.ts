@@ -1,7 +1,8 @@
 import express, { Request, Response } from "express";
-import { UserAttributes } from "../types/types";
+
 import models from "../models";
 import argon2 from 'argon2';
+import { UserAttributes } from "../types/user";
 const signUpRouter = express.Router();
 
 // Route to sign up

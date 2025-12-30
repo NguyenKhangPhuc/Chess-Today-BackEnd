@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { INVITATION_STATUS, InvitationAttributes } from "../types/types";
+import { InvitationAttributes } from "../types/invitation";
+import { INVITATION_STATUS } from "../types/enum";
 
 type InvitationCreationAttributes = Optional<InvitationAttributes, 'id' | 'status' | 'createdAt' | 'updatedAt'>;
 class Invitation extends Model<InvitationAttributes, InvitationCreationAttributes> implements InvitationAttributes {

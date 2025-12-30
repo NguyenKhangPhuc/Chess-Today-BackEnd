@@ -1,7 +1,7 @@
 import express, { Request, Response } from 'express';
 import { tokenExtractor } from '../utils/middleware';
-import { MessageAttributes } from '../types/types';
 import Message from '../models/message';
+import { MessageAttributes } from '../types/message';
 
 const messageRouter = express.Router();
 

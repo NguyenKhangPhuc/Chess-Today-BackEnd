@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { GameMessageAttributes } from "../types/types";
+import { GameMessageAttributes } from "../types/gameMessage";
 
 type GameMessageCreationAttribute = Optional<GameMessageAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 

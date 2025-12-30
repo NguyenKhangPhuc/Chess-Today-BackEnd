@@ -3,8 +3,8 @@ import { onlineUsers } from "../state/onlineUsers";
 import { gameService } from "../service/gameService";
 import Game from "../../models/game";
 import Move from "../../models/move";
-import { MoveAttributes } from "../../types/types";
 import { gameEmitter } from "../emitter/game.emitter";
+import { MoveAttributes } from "../../types/move";
 
 export function registerInGameHandlers(io: Server, socket: Socket) {
     // When the state of the chessboard change

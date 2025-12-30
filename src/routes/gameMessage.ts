@@ -1,8 +1,8 @@
 import express, { Request, Response } from 'express';
 import { tokenExtractor } from '../utils/middleware';
 import GameMessage from '../models/gameMessage';
-import { GameMessageAttributes } from '../types/types';
 import Game from '../models/game';
+import { GameMessageAttributes } from '../types/gameMessage';
 
 const gameMessageRouter = express.Router();
 

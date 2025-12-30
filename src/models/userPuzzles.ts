@@ -1,6 +1,7 @@
 import { DataTypes, Model, Optional, } from "sequelize";
 import { sequelize } from "../utils/db";
-import { PUZZLE_STATUS, UserPuzzleRelationAttribute } from "../types/types";
+import { UserPuzzleRelationAttribute } from "../types/userPuzzles";
+import { PUZZLE_STATUS } from "../types/enum";
 
 type UserPuzzleCreationAttributes = Optional<UserPuzzleRelationAttribute, 'id' | 'status'>;
 class UserPuzzles extends Model<UserPuzzleCreationAttributes, UserPuzzleRelationAttribute> implements UserPuzzleRelationAttribute {

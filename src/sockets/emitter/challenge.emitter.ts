@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { GAME_TYPE } from "../../types/types";
+import { GAME_TYPE } from "../../types/enum";
 
 class ChallengeEmitter {
     emitChallenge(io: Server, player1SocketId: string, player2SocketId: string, gameId: string, whitePlayerId: string, blackPlayerId: string, gameType: GAME_TYPE) {

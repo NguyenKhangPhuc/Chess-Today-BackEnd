@@ -1,5 +1,5 @@
 import express, { Request, Response } from 'express';
-import { UserAttributes } from '../types/types';
+import { UserAttributes } from '../types/user';
 const logoutRouter = express.Router();
 
 // Route to logout

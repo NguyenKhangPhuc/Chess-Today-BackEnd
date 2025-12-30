@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { PuzzleMoveAttributes } from "../types/types";
+import { PuzzleMoveAttributes } from "../types/puzzleMove";
 
 type PuzzleMoveCreationAttributes = Optional<PuzzleMoveAttributes, 'id' | 'promotion'>;
 

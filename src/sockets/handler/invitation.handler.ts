@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
-import { TokenAttributes } from "../../types/types";
 import { onlineUsers } from "../state/onlineUsers";
+import { TokenAttributes } from "../../types/types";
 
 export function registerInvitationHandler(io: Server, socket: Socket) {
     // To announce the receiver about the new invitation from the sender

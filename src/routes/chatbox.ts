@@ -2,9 +2,9 @@ import express, { Request, Response } from 'express';
 import { tokenExtractor } from '../utils/middleware';
 import ChatBox from '../models/chatbox';
 import { Op } from 'sequelize';
-import { ChatBoxAttributes } from '../types/types';
 import User from '../models/user';
 import Message from '../models/message';
+import { ChatBoxAttributes } from '../types/chatbox';
 const chatBoxRouter = express.Router();
 
 // Route to get all the chatbox of the verified user

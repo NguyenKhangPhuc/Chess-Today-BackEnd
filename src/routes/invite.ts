@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
 import models from "../models";
-import { InvitationAttributes } from '../types/types';
 import { tokenExtractor } from "../utils/middleware";
 import { Op } from "sequelize";
 import Invitation from "../models/invitation";
 import User from "../models/user";
 import { PaginationCursor } from "../helpers/pagination";
+import { InvitationAttributes } from "../types/invitation";
 const inviteRouter = express.Router();
 // Route to get the invitation where the user is the sender
 inviteRouter.get('/sender/user', tokenExtractor, async (req: Request, res: Response) => {

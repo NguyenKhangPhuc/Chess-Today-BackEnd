@@ -1,9 +1,9 @@
 import express from 'express';
 import { Response, Request } from 'express';
 import { tokenExtractor } from '../utils/middleware';
-import { ChallengeAttributes } from '../types/types';
 import Challenge from '../models/challenges';
 import { Op } from 'sequelize';
+import { ChallengeAttributes } from '../types/challenge';
 
 const challengeRouter = express.Router();
 

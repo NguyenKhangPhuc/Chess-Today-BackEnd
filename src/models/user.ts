@@ -1,6 +1,6 @@
 import { Model, DataTypes, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { UserAttributes } from "../types/types";
+import { UserAttributes } from "../types/user";
 type UserCreationAttributes = Optional<UserAttributes, 'id' | 'createdAt' | 'status' | 'updatedAt' | 'onlineAt' | 'rocketElo' | 'blitzElo' | 'isBot'>;
 class User extends Model<UserAttributes, UserCreationAttributes> implements UserAttributes {
     id!: string;

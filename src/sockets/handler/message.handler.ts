@@ -1,8 +1,8 @@
 import { Server, Socket } from "socket.io";
-import { MessageAttributes } from "../../types/types";
 import { onlineUsers } from "../state/onlineUsers";
 import { chatBoxService } from "../service/chatboxService";
 import Message from "../../models/message";
+import { MessageAttributes } from "../../types/message";
 
 export function registerMessageHandlers(io: Server, socket: Socket) {
     // To announce the receiver user about new message

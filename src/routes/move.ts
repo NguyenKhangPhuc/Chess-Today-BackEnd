@@ -1,9 +1,9 @@
 import express, { Request, Response } from 'express';
-import { MoveAttributes } from '../types/types';
 import Move from '../models/move';
 import { tokenExtractor } from '../utils/middleware';
 import User from '../models/user';
 import Game from '../models/game';
+import { MoveAttributes } from '../types/move';
 const moveRouter = express.Router();
 
 // Route to create the move in game

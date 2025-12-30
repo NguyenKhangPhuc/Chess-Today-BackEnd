@@ -1,4 +1,5 @@
-import { ChallengeAttributes } from "../../types/types";
+import { ChallengeAttributes } from "../../types/challenge";
+
 
 // To control the challenge page and users who enter it
 class ChallengePageController {

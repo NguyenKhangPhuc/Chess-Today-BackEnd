@@ -1,5 +1,6 @@
 import Game from "../../models/game";
-import { GAME_TYPE } from "../../types/types";
+import { GAME_TYPE } from "../../types/enum";
+
 
 class GameService {
     // Create the game with given info

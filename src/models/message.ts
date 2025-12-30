@@ -1,6 +1,6 @@
 import { DataTypes, Model, Optional } from "sequelize";
 import { sequelize } from "../utils/db";
-import { MessageAttributes } from "../types/types";
+import { MessageAttributes } from "../types/message";
 
 
 type MessageCreationAttributes = Optional<MessageAttributes, 'id'>;

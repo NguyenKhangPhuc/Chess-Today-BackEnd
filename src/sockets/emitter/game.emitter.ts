@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { GameAttributes } from "../../types/types";
+import { GameAttributes } from "../../types/game";
 
 class GameEmitter {
     emitBoardStateChange(io: Server, game: GameAttributes, user1SocketId: string, user2SocketId: string) {

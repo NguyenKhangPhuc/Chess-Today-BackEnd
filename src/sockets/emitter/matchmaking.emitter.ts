@@ -1,6 +1,6 @@
 import { Server } from "socket.io";
-import { GameAttributes } from "../../types/types";
 import { onlineUsers } from "../state/onlineUsers";
+import { GameAttributes } from "../../types/game";
 
 class MatchMakingEmitter {
     emitMatchFound(io: Server, match: GameAttributes) {

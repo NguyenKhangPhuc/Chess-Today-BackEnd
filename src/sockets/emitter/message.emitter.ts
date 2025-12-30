@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
 import { onlineUsers } from "../state/onlineUsers";
-import { ChatBoxAttributes, TokenAttributes } from "../../types/types";
+import { TokenAttributes } from "../../types/types";
+import { ChatBoxAttributes } from "../../types/chatbox";
+
 
 class MessageEmitter {
     emitNewMessage(io: Server, sender: TokenAttributes, receiverId: string, chatBox: ChatBoxAttributes | null) {
