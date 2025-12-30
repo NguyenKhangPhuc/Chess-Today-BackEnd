@@ -18,11 +18,17 @@ declare module "socket.io" {
 
 export const setUpSocket = (io: Server) => {
     io.on('connect', async (socket: Socket) => {
+        // Register the connection handlers
         await registerConnectionHandlers(socket);
+        // Register the match making handlers
         registerMatchMakingHandlers(io, socket);
+        // Register the in-game handlers
         registerInGameHandlers(io, socket);
+        // Register the invitation handler
         registerInvitationHandler(io, socket);
+        // Register the message handler
         registerMessageHandlers(io, socket);
+        // Register the challenge handler
         registerChallengeHandlers(io, socket);
     });
 };

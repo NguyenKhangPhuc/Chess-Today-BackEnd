@@ -2,6 +2,7 @@ import Game from "../../models/game";
 import { GAME_TYPE } from "../../types/types";
 
 class GameService {
+    // Create the game with given info
     createMatch(player1Id: string, player2Id: string, player1Time: number, player2Time: number, gameType: GAME_TYPE) {
         return Game.create({
             player1Id: player1Id,
@@ -12,6 +13,7 @@ class GameService {
         });
     }
 
+    // Update the game's player1 time and last move time when player1 move
     updatePlayerOneMove(newTimeLeft: number, gameId: string, fen: string) {
         const newPlayerLastMoveTime = new Date();
         return Game.update({
@@ -22,6 +24,7 @@ class GameService {
             { where: { id: gameId }, returning: true });
     }
 
+    // Update the game's player2 time and last move time when player2 move
     updatePlayerTwoMove(newTimeLeft: number, gameId: string, fen: string) {
         const newPlayerLastMoveTime = new Date();
         return Game.update({

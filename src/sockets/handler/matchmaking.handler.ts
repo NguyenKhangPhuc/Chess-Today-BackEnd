@@ -5,16 +5,18 @@ import { gameService } from "../service/gameService";
 import { matchMakingEmitter } from "../emitter/matchmaking.emitter";
 
 export function registerMatchMakingHandlers(io: Server, socket: Socket) {
+    // When user join the queue to have match making
     socket.on('join_queue', async (user: UserAttributes, timeSetting: { title: string, value: number, mode: GAME_TYPE }) => {
+        // Get the users
         const player: Player = { ...user, time: timeSetting.value };
         if (!socket.user) {
             console.log('User not authenticated');
             return;
         }
 
-
+        // Find the other best match player
         const bestMatch = await gameQueue.matchMaking(player, timeSetting.mode);
-
+        // If there exists -> create the match and emit it to both user
         if (bestMatch) {
             const match = await gameService.createMatch(player.id, bestMatch.id, player.time, bestMatch.time, timeSetting.mode);
 
@@ -22,12 +24,14 @@ export function registerMatchMakingHandlers(io: Server, socket: Socket) {
         }
     });
 
+    // When user want to exit the queue
     socket.on('exit_queue', (timeSetting: { title: string, value: number, mode: GAME_TYPE }) => {
         const userId = socket.user?.id;
         if (!userId) {
             console.log('ERROR: Unauthenticated');
             return;
         }
+        // Exit the user from the queue
         gameQueue.exitQueue(userId, timeSetting.mode);
         socket.emit('exit_queue', 'Exit successfully');
     });
