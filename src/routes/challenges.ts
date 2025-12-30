@@ -7,25 +7,22 @@ import { Op } from 'sequelize';
 
 const challengeRouter = express.Router();
 
-
+// Route to get all the challenge of the verified user
 challengeRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
-    const response = await Challenge.findAll({ where: { [Op.or]: [{ senderId: req.user.id }, { receiverId: req.user.id }] } });
+    // Find all the challenge where the userId is either senderId or receiverId
+    const response = await Challenge.findAll({ where: { [Op.or]: [{ senderId: req.user!.id }, { receiverId: req.user!.id }] } });
     if (!response) {
+        // If the response is null -> Error
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
     res.status(200).json(response);
     return;
 });
+
+// Route to get a specific challenge
 challengeRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
+    // Find the challenge by id
     const response = await Challenge.findByPk(req.params.id);
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -35,11 +32,9 @@ challengeRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, 
     return;
 });
 
+// Route to create the challenge
 challengeRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, { challenge: ChallengeAttributes }>, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
+    // Create the challenge with the given info in the request body.
     console.log(req.body.challenge);
     const response = await Challenge.create(req.body.challenge);
     if (!response) {

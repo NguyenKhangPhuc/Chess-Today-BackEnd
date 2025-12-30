@@ -31,7 +31,9 @@ export const tokenExtractor: RequestHandler = async (req, res, next) => {
             const foundUser = await models.User.findByPk(decodedToken.id);
             if (foundUser) {
                 req.user = decodedToken;
-
+            } else {
+                res.status(404).json({ error: 'Not authenticated' });
+                return;
             }
         } else {
             res.status(404).json({ error: 'invalid Token' });

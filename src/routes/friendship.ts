@@ -9,12 +9,14 @@ import { PaginationCursor } from '../helpers/pagination';
 
 const friendshipRouter = express.Router();
 
+// Get the relationship of the verified user.
 friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    // Get the query params from the front-end including cursor after - before and limit to take
     const { after, before, limit } = req.query;
-    console.log(req.query);
-    console.log(limit, 'LIMIT');
-    console.log(req.params.id);
     let where = {};
+    // If there exitst after cursor -> we have to set the where conditions of the query to:
+    // Get the data where the userId is either userId or friendId
+    // Besides, the value of there created_at field must be less than after cursor (older than the cursor)
     if (after) {
         where = {
             [Op.and]: [
@@ -29,6 +31,9 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
             ]
         };
     }
+    // If there exitst before cursor -> we have to set the where conditions of the query to:
+    // Get the data where the userId is either userId or friendId
+    // Besides, the value of there created_at field must be greater than after cursor (newer than the cursor)
     if (before) {
         where = {
             [Op.and]: [
@@ -43,6 +48,11 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
             ]
         };
     }
+
+    // Find all the relations with the where condition above
+    // If there exists no after and before cursor -> get data if userId = userId or userId = friendId
+    // If there exists no after and before cursor or exists only after cursor -> get data from newest to oldest
+    // Else -> get data from oldest to newest
     const response = await FriendShip.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
             [Op.or]: [
@@ -69,19 +79,18 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
+    // Get the new next/prev cursor and the boolean value which show if there exists next/prev page.
     const { data, hasNextPage, hasPrevPage, nextCursor, prevCursor } = PaginationCursor<FriendAttributes>(response, Number(limit), after as string | undefined, before as string | undefined);
     res.status(200).json({ data, hasNextPage, hasPrevPage, nextCursor, prevCursor });
     return;
 });
 
+// Route to create friendship relation with other person
 friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, FriendAttributes>, res: Response) => {
+    // Get the id from the other person from request body
     const { friendId } = req.body;
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
-
-    const response = await models.FriendShip.create({ userId: req.user?.id, friendId });
+    // Create the friendship
+    const response = await models.FriendShip.create({ userId: req.user!.id, friendId });
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
@@ -90,18 +99,17 @@ friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown,
     return;
 });
 
+
+// Route to delete the friendship relation with other person
 friendshipRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
-    console.log('friendship id', req.params.id);
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
+    // Find the friendship by its id from the request params
     const response = await models.FriendShip.findByPk(req.params.id);
     if (!response) {
         res.status(401).json({ error: 'Friendship not found' });
         return;
     }
-    const isCorrectUser = response.userId === req.user.id || response.friendId === req.user.id;
+    // Check if the person who delete this friendship is permitted to do it.
+    const isCorrectUser = response.userId === req.user!.id || response.friendId === req.user!.id;
     if (!isCorrectUser) {
         res.status(403).json({ error: 'Incorrect user, action not allowed' });
         return;

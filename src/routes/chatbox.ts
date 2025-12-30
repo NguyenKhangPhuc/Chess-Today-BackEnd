@@ -7,16 +7,15 @@ import User from '../models/user';
 import Message from '../models/message';
 const chatBoxRouter = express.Router();
 
+// Route to get all the chatbox of the verified user
 chatBoxRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
+
+    // Find all the chatbox where the userId is either user1Id or user2Id, using join query on User and Message table.
     const response = await ChatBox.findAll({
         where: {
             [Op.or]: [
-                { user1Id: req.user.id },
-                { user2Id: req.user.id }
+                { user1Id: req.user!.id },
+                { user2Id: req.user!.id }
             ]
         },
         include: [
@@ -36,6 +35,7 @@ chatBoxRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
             }
         ]
     });
+    // If the response is null -> error
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
@@ -44,18 +44,20 @@ chatBoxRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
     return;
 });
 
+// Route to create a chatbox
 chatBoxRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, ChatBoxAttributes>, res: Response) => {
-    if (!req.user) {
-        res.status(401).json({ error: 'Not authenticated' });
-        return;
-    }
+
+    // userA and userB are the indexes of the chatbox tables, normalize them before create
+    // so that we can avoid duplicate chatbox of the same user.
     const [userA, userB] =
         req.body.user1Id < req.body.user2Id
             ? [req.body.user1Id, req.body.user2Id]
             : [req.body.user2Id, req.body.user1Id];
+    // Store the value to the body object and create the chatbox
     req.body.userA = userA;
     req.body.userB = userB;
     const response = await ChatBox.create(req.body);
+    // If the response is null -> error
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;

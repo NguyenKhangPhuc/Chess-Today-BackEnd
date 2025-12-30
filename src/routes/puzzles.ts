@@ -6,7 +6,9 @@ import PuzzleMove from '../models/puzzleMove';
 
 const puzzleRouter = express.Router();
 
+// Route to get all the puzzles and include its valid moves
 puzzleRouter.get('/', tokenExtractor, async (_: Request, res: Response) => {
+    // Get all the puzzle and its valid moves
     const response = await Puzzle.findAll({
         include: [
             {

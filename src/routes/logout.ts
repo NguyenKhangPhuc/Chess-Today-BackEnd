@@ -2,7 +2,9 @@ import express, { Request, Response } from 'express';
 import { UserAttributes } from '../types/types';
 const logoutRouter = express.Router();
 
+// Route to logout
 logoutRouter.post('/', (_: Request<unknown, unknown, UserAttributes>, res: Response) => {
+    // Remove the token from the cookies
     res.clearCookie('access_token', {
         httpOnly: true,
         secure: true,
