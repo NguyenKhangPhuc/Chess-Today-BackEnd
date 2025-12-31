@@ -4,6 +4,7 @@ import { tokenExtractor } from '../utils/middleware';
 import Challenge from '../models/challenges';
 import { Op } from 'sequelize';
 import { ChallengeAttributes } from '../types/challenge';
+import User from '../models/user';
 
 const challengeRouter = express.Router();
 
@@ -37,11 +38,25 @@ challengeRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, 
     // Create the challenge with the given info in the request body.
     console.log(req.body.challenge);
     const response = await Challenge.create(req.body.challenge);
-    if (!response) {
+    const challengeWithUser = await Challenge.findByPk(response.id, {
+        include: [
+            {
+                model: User,
+                as: 'sender',
+                attributes: ['id', 'username', 'name']
+            },
+            {
+                model: User,
+                as: 'sender',
+                attributes: ['id', 'username', 'name']
+            }
+        ]
+    });
+    if (!challengeWithUser) {
         res.status(500).json({ error: 'Internal server error' });
         return;
     }
-    res.status(200).json(response);
+    res.status(200).json(challengeWithUser);
 });
 
 export default challengeRouter;

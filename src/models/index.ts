@@ -50,7 +50,7 @@ Puzzle.hasMany(PuzzleMove, { foreignKey: 'puzzleId', as: 'validMoves' });
 User.hasMany(Challenge, { foreignKey: 'senderId', as: 'challenge_sender' });
 User.hasMany(Challenge, { foreignKey: 'receiverId', as: 'challenge_receiver' });
 Challenge.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
-Challenge.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver_id' });
+Challenge.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
 
 export default {
     User,

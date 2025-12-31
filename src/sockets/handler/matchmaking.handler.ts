@@ -34,6 +34,7 @@ export function registerMatchMakingHandlers(io: Server, socket: Socket) {
         }
         // Exit the user from the queue
         gameQueue.exitQueue(userId, timeSetting.mode);
+        console.log('exit queue');
         socket.emit('exit_queue', 'Exit successfully');
     });
 }
