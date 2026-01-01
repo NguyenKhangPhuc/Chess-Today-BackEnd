@@ -3,6 +3,8 @@ import express, { Request, Response } from "express";
 import models from "../models";
 import argon2 from 'argon2';
 import { UserAttributes } from "../types/user";
+import { generateCode, hashToken, sendVerificationEmail } from "../helpers/verification";
+import Verification from "../models/verification";
 const signUpRouter = express.Router();
 
 // Route to sign up
@@ -18,8 +20,19 @@ signUpRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, re
         res.status(400).json({ error: 'Invalid password, password must be 8-16 words' });
         return;
     }
-    await models.User.create(newUser);
-    res.status(200).json({ message: 'Sign up successfully', newUser });
+
+    const createdUser = await models.User.create(newUser);
+    if (createdUser) {
+        const code = generateCode();
+        const hashedCode = hashToken(code);
+        const verificationCode = { hashToken: hashedCode, userId: createdUser.id, expiredAt: new Date(Date.now() + 5 * 60 * 1000) };
+        await Verification.destroy({ where: { userId: createdUser.id } });
+        const createdVerificationCode = await Verification.create(verificationCode);
+        if (createdVerificationCode) {
+            await sendVerificationEmail(createdUser.username, code);
+        }
+    }
+    res.status(200).json({ userId: createdUser.id });
     return;
 });
 

@@ -13,7 +13,8 @@ export interface UserAttributes {
     elo: number
     rocketElo: number,
     blitzElo: number,
-    isBot: boolean
+    isBot: boolean,
+    isVerified: boolean,
 }
 
 

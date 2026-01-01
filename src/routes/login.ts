@@ -28,7 +28,11 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         res.status(400).json({ error: 'Wrong credentials' });
         return;
     }
-
+    // If the user has not verified -> return an error 
+    if (foundUser.isVerified == false) {
+        res.status(400).json({ error: 'Account not verified', errorCode: 'UNVERIFIED' });
+        return;
+    }
     // Verify the given password and the hash password from the user found
     const valid = await argon2.verify(foundUser.password, receivedUser.password);
     // If it is not valid -> wrong credentials

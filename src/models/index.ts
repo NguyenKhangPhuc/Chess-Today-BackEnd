@@ -10,6 +10,7 @@ import Puzzle from "./puzzle";
 import PuzzleMove from "./puzzleMove";
 import User from "./user";
 import UserPuzzles from "./userPuzzles";
+import Verification from "./verification";
 
 User.hasMany(Invitation, { foreignKey: 'senderId', as: 'sentInvitations' });
 User.hasMany(Invitation, { foreignKey: 'receiverId', as: 'receivedInvitations' });
@@ -51,6 +52,10 @@ User.hasMany(Challenge, { foreignKey: 'senderId', as: 'challenge_sender' });
 User.hasMany(Challenge, { foreignKey: 'receiverId', as: 'challenge_receiver' });
 Challenge.belongsTo(User, { foreignKey: 'senderId', as: 'sender' });
 Challenge.belongsTo(User, { foreignKey: 'receiverId', as: 'receiver' });
+
+
+User.hasMany(Verification, { foreignKey: 'userId', as: 'user' });
+Verification.belongsTo(User, { foreignKey: 'userId', as: 'user' });
 
 export default {
     User,

@@ -24,6 +24,7 @@ import puzzleMovesRouter from './routes/puzzleMoves';
 import userPuzzlesRouter from './routes/userPuzzles';
 import challengeRouter from './routes/challenges';
 import logoutRouter from './routes/logout';
+import verificationRouter from './routes/verification';
 const app = express();
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 const server = http.createServer(app);
@@ -83,6 +84,7 @@ app.use('/api/puzzle-moves', puzzleMovesRouter);
 app.use('/api/user-puzzle', userPuzzlesRouter);
 app.use('/api/challenge', challengeRouter);
 app.use('/api/logout', logoutRouter);
+app.use('/api/verification', verificationRouter);
 
 app.use(errorHandler);
 app.use(unknownEndpoint);
