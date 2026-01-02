@@ -6,6 +6,9 @@ import User from '../models/user';
 import { PaginationCursor } from '../helpers/pagination';
 import { UserAttributes } from '../types/user';
 import { GAME_TYPE } from '../types/enum';
+import * as argon2 from 'argon2';
+import Verification from '../models/verification';
+import { hashToken } from '../helpers/verification';
 const userRouter = express.Router();
 
 // Route to check if the user is verified and return
@@ -186,7 +189,49 @@ userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unkno
     return;
 });
 
-//
+userRouter.put('/update-password', async (req: Request<unknown, unknown, { username: string, code: string, oldPass: string, newPass: string }>, res: Response) => {
+    const { username, code, oldPass, newPass } = req.body;
+    // Find and verify the user password
+    const foundUser = await User.findOne({ where: { username } });
+    if (!foundUser) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+    }
+
+    const isValid = await argon2.verify(foundUser.password, oldPass);
+    if (!isValid) {
+        res.status(401).json({ error: 'Incorrect old password' });
+        return;
+    }
+    // Find and verify the verification code
+    const verificationCode = await Verification.findOne({
+        where: { userId: foundUser.id },
+    });
+    if (!verificationCode) {
+        res.status(404).json({ error: 'Verification code not found' });
+        return;
+    }
+
+    if (verificationCode.expiredAt < new Date()) {
+        res.status(410).json({ error: 'Verification code expired' });
+        return;
+    }
+
+    if (verificationCode.hashToken !== hashToken(code)) {
+        res.status(401).json({ error: 'Invalid verification code' });
+        return;
+    }
+    // Update new password
+    const newHashPass = await argon2.hash(newPass);
+
+    await foundUser.update({ password: newHashPass });
+
+
+    res.status(200).json({ message: 'Password updated successfully' });
+    return;
+
+
+});
 
 
 export default userRouter;

@@ -23,12 +23,16 @@ signUpRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, re
 
     const createdUser = await models.User.create(newUser);
     if (createdUser) {
+        // Create the random code
         const code = generateCode();
+        // Hash the code
         const hashedCode = hashToken(code);
+        // Delete old verification code and Create the verification code 
         const verificationCode = { hashToken: hashedCode, userId: createdUser.id, expiredAt: new Date(Date.now() + 5 * 60 * 1000) };
         await Verification.destroy({ where: { userId: createdUser.id } });
         const createdVerificationCode = await Verification.create(verificationCode);
         if (createdVerificationCode) {
+            // Send the verification email
             await sendVerificationEmail(createdUser.username, code);
         }
     }
