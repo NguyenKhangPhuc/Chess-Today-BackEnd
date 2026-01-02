@@ -5,10 +5,11 @@ import { Op } from 'sequelize';
 import User from '../models/user';
 import { PaginationCursor } from '../helpers/pagination';
 import { UserAttributes } from '../types/user';
-import { GAME_TYPE, VERIFICATION_TYPE } from '../types/enum';
+import { GAME_STATUS, GAME_TYPE, VERIFICATION_TYPE } from '../types/enum';
 import * as argon2 from 'argon2';
 import Verification from '../models/verification';
 import { hashToken } from '../helpers/verification';
+import Game from '../models/game';
 const userRouter = express.Router();
 
 // Route to check if the user is verified and return
@@ -157,10 +158,23 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
 });
 
 // Route to update the user elo based on the gameType
-userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unknown, { gameType: GAME_TYPE, userElo: number }>, res: Response) => {
+userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unknown, { gameId: string, gameType: GAME_TYPE, userElo: number, opponentId: string, opponentElo: number }>, res: Response) => {
+    // Find the game and check its status
+    console.log("Update userElo", req.body);
+    const game = await Game.findByPk(req.body.gameId);
+    if (!game) {
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+    }
+
+    if (game.gameStatus == GAME_STATUS.FINISHED) {
+        res.status(409).json({ error: 'Game is already been updated' });
+        return;
+    }
     // Find the user based on the id from the decoded token
     const user = await User.findByPk(req.user!.id);
-    if (!user) {
+    const opponent = await User.findByPk(req.body.opponentId);
+    if (!user || !opponent) {
         res.status(401).json({ error: 'User not found' });
         return;
     }
@@ -178,10 +192,12 @@ userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unkno
         return;
     }
     // Update the suitable field above
+    console.log('Update userElo');
     const response = await user.update({
         [fieldToUpdate]: req.body.userElo
     });
-    if (!response) {
+    const opponentResponse = await opponent.update({ [fieldToUpdate]: req.body.opponentElo });
+    if (!response || !opponentResponse) {
         res.status(500).json({ error: 'Internal server error' });
         return;
     }
