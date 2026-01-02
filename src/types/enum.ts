@@ -26,3 +26,8 @@ export enum PUZZLE_STATUS {
     SOLVED = 'solved',
     UNSOLVED = 'unsolved',
 }
+
+export enum VERIFICATION_TYPE {
+    PASSWORD_RESET = 'PASSWORD_RESET',
+    AUTHENTICATION = 'AUTHENTICATION'
+}

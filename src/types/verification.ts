@@ -1,3 +1,5 @@
+import { VERIFICATION_TYPE } from "./enum";
+
 export interface VerificationAttributes {
     id: string,
     userId: string,
@@ -5,4 +7,5 @@ export interface VerificationAttributes {
     expiredAt: Date;
     createdAt?: Date;
     updatedAt?: Date;
+    type: VERIFICATION_TYPE
 }

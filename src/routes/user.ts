@@ -5,7 +5,7 @@ import { Op } from 'sequelize';
 import User from '../models/user';
 import { PaginationCursor } from '../helpers/pagination';
 import { UserAttributes } from '../types/user';
-import { GAME_TYPE } from '../types/enum';
+import { GAME_TYPE, VERIFICATION_TYPE } from '../types/enum';
 import * as argon2 from 'argon2';
 import Verification from '../models/verification';
 import { hashToken } from '../helpers/verification';
@@ -205,7 +205,7 @@ userRouter.put('/update-password', async (req: Request<unknown, unknown, { usern
     }
     // Find and verify the verification code
     const verificationCode = await Verification.findOne({
-        where: { userId: foundUser.id },
+        where: { userId: foundUser.id, type: VERIFICATION_TYPE.PASSWORD_RESET },
     });
     if (!verificationCode) {
         res.status(404).json({ error: 'Verification code not found' });
