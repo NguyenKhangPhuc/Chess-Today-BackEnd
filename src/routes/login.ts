@@ -1,6 +1,6 @@
 import express, { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import { JWT_SECRET } from '../utils/config';
+import { JWT_SECRET, NODE_ENV } from '../utils/config';
 import models from '../models';
 import argon2 from 'argon2';
 import { UserAttributes } from '../types/user';
@@ -53,13 +53,24 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         return;
     }
     // Store the token to the cookies
-    res.cookie('access_token', token, {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'none',
-        path: '/',
+    if (NODE_ENV == 'development') {
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            path: '/',
 
-    });
+        });
+    } else {
+        res.cookie('access_token', token, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            path: '/',
+            domain: '.chess-today-front-end.vercel.app',
+
+        });
+    }
     console.log(res.getHeaders()['set-cookie']);
     res.status(200).json({ message: 'Login sucessfully' });
     return;
