@@ -25,6 +25,7 @@ import userPuzzlesRouter from './routes/userPuzzles';
 import challengeRouter from './routes/challenges';
 import logoutRouter from './routes/logout';
 import verificationRouter from './routes/verification';
+import { NODE_ENV } from './utils/config';
 const app = express();
 // eslint-disable-next-line @typescript-eslint/no-misused-promises
 const server = http.createServer(app);
@@ -32,13 +33,13 @@ const server = http.createServer(app);
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-    origin: 'https://chess-today-front-end.vercel.app',
+    origin: NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://chess-today-front-end.vercel.app',
     credentials: true
 }));
 
 const io = new Server(server, {
     cors: {
-        origin: 'https://chess-today-front-end.vercel.app',
+        origin: NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://chess-today-front-end.vercel.app',
         methods: ['GET', 'POST'],
         credentials: true
     },

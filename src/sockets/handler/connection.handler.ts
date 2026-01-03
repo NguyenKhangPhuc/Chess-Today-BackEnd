@@ -22,15 +22,5 @@ export async function registerConnectionHandlers(socket: Socket) {
         }
     });
 
-    // Handle when user logout, delete the user info and remove from the map
-    socket.on("logout_user", async () => {
-        console.log('log out user');
-        if (socket.user?.id) {
-            onlineUsers.remove(socket.user.id);
-            await User.update({ isOnline: false, onlineAt: new Date() }, { where: { id: socket.user.id } });
-            socket.user = undefined;
-            socket.emit("logout_user");
-        }
-    });
 
 }

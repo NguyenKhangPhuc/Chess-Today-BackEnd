@@ -60,6 +60,7 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
         path: '/',
 
     });
+    console.log(res.getHeaders()['set-cookie']);
     res.status(200).json({ message: 'Login sucessfully' });
     return;
 });
