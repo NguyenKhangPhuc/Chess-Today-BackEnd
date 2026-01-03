@@ -67,7 +67,7 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
             secure: true,
             sameSite: 'none',
             path: '/',
-            domain: '.chess-today-front-end.vercel.app',
+            domain: '.chesstoday.online',
 
         });
     }
