@@ -33,13 +33,13 @@ const server = http.createServer(app);
 app.use(cookieParser());
 app.use(express.json());
 app.use(cors({
-    origin: NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://www.chesstoday.online/',
+    origin: NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://www.chesstoday.online',
     credentials: true
 }));
 
 const io = new Server(server, {
     cors: {
-        origin: NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://www.chesstoday.online/',
+        origin: NODE_ENV == 'development' ? 'http://localhost:3000' : 'https://www.chesstoday.online',
         methods: ['GET', 'POST'],
         credentials: true
     },
