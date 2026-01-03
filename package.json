@@ -6,8 +6,9 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ts-node-dev src/index.ts",
     "lint": "eslint .",
-    "tsc": "tsc",
-    "rollback": "ts-node src/utils/rollback.ts"
+    "build": "tsc",
+    "rollback": "ts-node src/utils/rollback.ts",
+    "start": "node build/src/index.js"
   },
   "author": "Khang Phuc Nguyen",
   "license": "ISC",
