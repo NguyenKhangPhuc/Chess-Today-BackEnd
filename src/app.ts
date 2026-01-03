@@ -68,6 +68,11 @@ app.get('/ping', (_req, res) => {
     res.send('pong');
 });
 
+app.get('/health', (_req, res) => {
+    res.status(200).json({ status: 'ok' });
+    return;
+});
+
 app.use('/api/analyze', analyzeRouter);
 app.use('/api/sign-up', signUpRouter);
 app.use('/api/login', loginRouter);
