@@ -1,5 +1,5 @@
 import { Sequelize } from "sequelize";
-import { DATABASE_URL } from "./config";
+import { DATABASE_URL, NODE_ENV } from "./config";
 import { Umzug, SequelizeStorage } from "umzug";
 
 // Setting up postgreSQL DB with Umzug
@@ -20,7 +20,7 @@ export const connectToDB = async () => {
 // Migration config, all files migration go to src/migrations folder
 const migrationConfig = {
     migrations: {
-        glob: 'src/migrations/*.ts',
+        glob: NODE_ENV == 'development' ? 'src/migrations/*.ts' : 'build/src/migrations/*.js',
     },
     storage: new SequelizeStorage({ sequelize, tableName: 'migrations' }),
     context: sequelize.getQueryInterface(), // passing the sequelize query interface to the context of migration files
