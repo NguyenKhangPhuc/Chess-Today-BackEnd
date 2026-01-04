@@ -130,7 +130,6 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
         res.status(400).json({ error: 'Invalid id' });
         return;
     }
-    console.log(id, "Params id");
     // Get the specific user information through the req params, including the friends
     const response = await models.User.findByPk(id, {
         attributes: { exclude: ['password'] },
@@ -154,7 +153,6 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
             },
         ]
     });
-    console.log(response);
     if (!response) {
         res.status(500).json({ error: 'Internal server error' });
         return;
@@ -170,7 +168,6 @@ userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unkno
         return;
     }
     // Find the game and check its status
-    console.log("Update userElo", req.body);
     const game = await Game.findByPk(gameId);
     if (!game) {
         res.status(500).json({ error: 'Internal server error' });
@@ -202,7 +199,6 @@ userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unkno
         return;
     }
     // Update the suitable field above
-    console.log('Update userElo');
     const response = await user.update({
         [fieldToUpdate]: userElo
     });

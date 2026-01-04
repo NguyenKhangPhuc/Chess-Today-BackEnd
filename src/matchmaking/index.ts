@@ -17,7 +17,6 @@ class MatchMakingQueue {
         // If the queue length == 0 -> just add the user to the queue
         if (this.playerQueue.length === 0) {
             this.playerQueue.push(player);
-            console.log(this.playerQueue);
             return;
         }
 
@@ -53,9 +52,7 @@ class MatchMakingQueue {
             }
         }
         // Insert the player at the position startIndex, everything behind is pushed to the right
-        console.log('startIndex, endIndex', startIndex, endIndex);
         this.playerQueue.splice(startIndex, 0, player);
-        console.log(this.playerQueue);
     }
 
     // Remove the play from queue
@@ -66,7 +63,6 @@ class MatchMakingQueue {
         if (index !== -1) {
             this.playerQueue.splice(index, 1);
         }
-
     }
 
     // Find match and return the best suitable player
@@ -99,7 +95,6 @@ class MatchMakingQueue {
         }
         let score: number = Infinity;
         let bestMatch: Player | null = null;
-        console.log('start,end', startIndex, endIndex);
         // Loop from the current index to the end of the queue and also return if the foundPlayerELo > maxElo
         for (let i = startIndex; i < this.playerQueue.length && this.playerQueue[i].time === player.time; i++) {
             // Get the current index player elo base on the gameType

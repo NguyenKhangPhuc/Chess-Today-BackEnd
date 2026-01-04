@@ -8,7 +8,6 @@ export function registerInvitationHandler(io: Server, socket: Socket) {
         // Get the sender and receiverId
         const { sender, receiverId } = payload;
 
-        console.log('New invitation:', sender, receiverId);
         // Get the receiver socket id and emit to it about the invitation
         const receiverSocketId = onlineUsers.getSocketId(receiverId);
         if (receiverSocketId) {

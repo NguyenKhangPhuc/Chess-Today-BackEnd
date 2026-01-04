@@ -69,7 +69,6 @@ analyzeRouter.post('/explanation', tokenExtractor, async (req: Request<unknown, 
     }
 
     // Get the score from the body;
-    console.log('This is game Id and sender Id', gameId, senderId);
     if (!score) {
         // If the score is null -> initialize the stockfish engine
         const engine = new StockfishEngine();

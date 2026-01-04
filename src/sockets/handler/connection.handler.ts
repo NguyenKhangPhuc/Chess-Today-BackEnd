@@ -4,7 +4,6 @@ import { onlineUsers } from "../state/onlineUsers";
 
 export async function registerConnectionHandlers(socket: Socket) {
     console.log("User connected", socket.id);
-
     if (socket.user?.id) {
         // If the user connected and is logged in -> add they to the current online users map
         onlineUsers.add(socket.user.id, socket.id);

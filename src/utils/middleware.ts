@@ -59,14 +59,12 @@ export const tokenExtractor: RequestHandler = async (req, res, next) => {
 export const socketTokenExtractor = async (socket: Socket, next: (err?: Error) => void) => {
     // Get all the field from the cookies header
     const cookieHeader = socket.request.headers.cookie;
-    console.log('Socket cookie', cookieHeader);
     if (!cookieHeader) {
         return next(new Error('No cookie sent'));
     }
     // Parse the cookies header string to an object
     const cookies = cookie.parse(cookieHeader);
     // Get the access_token from the object
-    console.log('This is token from Socket', cookie);
     const token = cookies['access_token'];
     if (token) {
         // Verify the token
@@ -78,15 +76,21 @@ export const socketTokenExtractor = async (socket: Socket, next: (err?: Error) =
                 // Set the socket.user to basic user info
                 socket.user = decodedToken;
             } else {
-                next(new Error('JsonWebTokenError'));
+                const err = new Error('JsonWebTokenError');
+                err.name = 'JsonWebTokenError';
+                next(err);
                 return;
             }
         } else {
-            next(new Error('JsonWebTokenError'));
+            const err = new Error('JsonWebTokenError');
+            err.name = 'JsonWebTokenError';
+            next(err);
             return;
         }
     } else {
-        next(new Error('JsonWebTokenError'));
+        const err = new Error('JsonWebTokenError');
+        err.name = 'JsonWebTokenError';
+        next(err);
         return;
     }
     next();

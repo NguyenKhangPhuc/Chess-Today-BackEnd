@@ -10,7 +10,6 @@ const inviteRouter = express.Router();
 // Route to get the invitation where the user is the sender
 inviteRouter.get('/sender/user', tokenExtractor, async (req: Request, res: Response) => {
     const { limit, after, before } = req.query;
-    console.log("Sent Invitation ", req.query);
     let where = {};
     // If there exitst after cursor -> we have to set the where conditions of the query to:
     // Get the data where the userId is senderId
@@ -64,7 +63,6 @@ inviteRouter.get('/sender/user', tokenExtractor, async (req: Request, res: Respo
 // Route to get the invitation where the user is the receiver
 inviteRouter.get('/receiver/user', tokenExtractor, async (req: Request, res: Response) => {
     const { limit, after, before } = req.query;
-    console.log("Sent Invitation ", req.query);
     let where = {};
     // If there exitst after cursor -> we have to set the where conditions of the query to:
     // Get the data where the userId is receiverId
@@ -88,7 +86,6 @@ inviteRouter.get('/receiver/user', tokenExtractor, async (req: Request, res: Res
             ]
         };
     }
-    console.log(where);
     // Find all the user's games with the where condition above
     // If there exists no after and before cursor -> get data if userId = receiverId
     // If there exists no after and before cursor or exists only after cursor -> get data from newest to oldest

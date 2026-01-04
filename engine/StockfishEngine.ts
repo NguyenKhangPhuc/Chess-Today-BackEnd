@@ -38,7 +38,6 @@ export class StockfishEngine {
             // Đọc đầu ra của Stockfish
             this.process.stdout.on('data', (data: Buffer) => {
                 const lines = data.toString().split('\n');
-                console.log(lines);
                 for (const line of lines) {
                     if (line.startsWith('info')) {
                         score = this.parseScore(line);
@@ -64,7 +63,6 @@ export class StockfishEngine {
 
             this.process.stdout.on('data', (data: Buffer) => {
                 const lines = data.toString().split('\n');
-                console.log(lines);
                 for (const line of lines) {
                     if (line.startsWith('info')) {
                         score = this.parseScore(line);

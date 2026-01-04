@@ -11,7 +11,7 @@ export function registerMatchMakingHandlers(io: Server, socket: Socket) {
         // Get the users
         const player: Player = { ...user, time: timeSetting.value };
         if (!socket.user) {
-            console.log('User not authenticated');
+            socket.emit('socket_error', { error: 'Not authenticated', listener: 'join_queue' });
             return;
         }
 
@@ -27,14 +27,13 @@ export function registerMatchMakingHandlers(io: Server, socket: Socket) {
 
     // When user want to exit the queue
     socket.on('exit_queue', (timeSetting: { title: string, value: number, mode: GAME_TYPE }) => {
-        const userId = socket.user?.id;
-        if (!userId) {
-            console.log('ERROR: Unauthenticated');
+        if (!socket.user) {
+            socket.emit('socket_error', { error: 'Not authenticated', listener: 'exit_queue' });
             return;
         }
+        const userId = socket.user?.id;
         // Exit the user from the queue
         gameQueue.exitQueue(userId, timeSetting.mode);
-        console.log('exit queue');
         socket.emit('exit_queue', 'Exit successfully');
     });
 }

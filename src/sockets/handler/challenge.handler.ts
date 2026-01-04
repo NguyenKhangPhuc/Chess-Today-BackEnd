@@ -11,14 +11,13 @@ export function registerChallengeHandlers(io: Server, socket: Socket) {
         // Get the challenge receiverSocketId and emit to them about new challenge
         const receiverSocketId = onlineUsers.getSocketId(challenge.receiverId);
         if (receiverSocketId) {
-            console.log('sending challenge');
             io.to(receiverSocketId).emit('new_challenge', challenge);
         }
     });
     // To handle user enter the page
     socket.on('waiting_challenge', async (challenge: ChallengeAttributes) => {
         if (!socket.user) {
-            console.log('Not authenticated');
+            socket.emit('socket_error', { error: 'Not authenticated', listener: 'waiting_challenge' });
             return;
         }
         const userId = socket.user.id;
@@ -36,6 +35,7 @@ export function registerChallengeHandlers(io: Server, socket: Socket) {
                 challengePageController.deletePage(challenge.id!);
                 if (!player1SocketId || !player2SocketId) {
                     console.log('Error: User out page');
+                    return;
                 }
                 // Create the match and emit to both users
                 const response = await gameService.createMatch(whitePlayerId, blackPlayerId, challenge.playerTime, challenge.playerTime, challenge.gameType);
@@ -46,10 +46,9 @@ export function registerChallengeHandlers(io: Server, socket: Socket) {
 
     socket.on('leave_challenge', (payload: { challengeId: string }) => {
         if (!socket.user) {
-            console.log('Not authenticated');
+            socket.emit('socket_error', { error: 'Not authenticated', listener: 'leave_challenge' });
             return;
         }
-        console.log('user leave page');
         challengePageController.deleteUserFromPage(payload.challengeId, socket.user.id);
     });
 }

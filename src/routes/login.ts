@@ -75,7 +75,6 @@ loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res
 
         });
     }
-    console.log(res.getHeaders()['set-cookie']);
     res.status(200).json({ message: 'Login sucessfully' });
     return;
 });

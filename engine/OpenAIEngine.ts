@@ -42,7 +42,6 @@ The score after make the move is: score type: ${score?.type} - value: ${score?.v
             messages: [{ role: 'user', content: prompt }],
             temperature: 0.7,
         });
-        console.log('Đây là câu trả lời', response.choices[0].message);
         return response.choices[0].message.content?.trim() || 'Không có giải thích.';
     }
 }

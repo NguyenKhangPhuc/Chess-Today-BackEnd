@@ -10,7 +10,7 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
     // When the state of the chessboard change
     socket.on('board_state_change', async ({ opponentId, roomId, fen, newTimeLeft, newMove }: { opponentId: string, roomId: string, fen: string, newTimeLeft: number, newMove: MoveAttributes }) => {
         if (!socket.user) {
-            console.log('Not authenticated');
+            socket.emit('socket_error', { error: 'Not authenticated', listener: 'board_state_change' });
             return;
         }
         // Get the opponent and user socketId
@@ -20,12 +20,12 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
         const game = await Game.findByPk(roomId);
 
         if (!game) {
-            console.log("ERROR: Game not found");
+            socket.emit('socket_error', { error: 'Game not found', listener: 'board_state_change' });
             return;
         };
         // Verify the userId with the game player
         if (socket.user.id != game.player1Id && socket.user.id != game.player2Id) {
-            console.log("Incorrect player");
+            socket.emit('socket_error', { error: 'Userid not match', listener: 'board_state_change' });
             return;
         };
         try {
@@ -35,7 +35,6 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
                 // Create the new move
                 await Move.create(newMove);
                 // Get the newly returned value from the game
-                console.log("This is response", rows[0].toJSON());
                 // Emit to both the player
                 if (opponentSocketId) {
                     gameEmitter.emitBoardStateChange(io, rows[0].toJSON(), opponentSocketId);
@@ -47,14 +46,14 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
                 // Create the new move
                 await Move.create(newMove);
                 // Get the newly returned value from the game
-                console.log("This is response", rows[0].toJSON());
                 // Emit to both the player
                 if (opponentSocketId) {
                     gameEmitter.emitBoardStateChange(io, rows[0].toJSON(), opponentSocketId);
                 }
             }
         } catch (error) {
-            console.log(error);
+            socket.emit('socket_error', { error, listener: 'board_state_change' });
+            return;
         }
     });
 
