@@ -91,7 +91,7 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
 
 // Route to create friendship relation with other person
 friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, FriendAttributes>, res: Response) => {
-    if (req.body) {
+    if (!req.body) {
         res.status(400).json({ error: 'Invalid payload' });
         return;
     }

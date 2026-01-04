@@ -158,9 +158,8 @@ inviteRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string }, 
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
-
     // Check if the user who tried to delete it is the correct user
-    if (req.user!.id != response.senderId || req.user!.id != response.receiverId) {
+    if (req.user!.id != response.senderId && req.user!.id != response.receiverId) {
         res.status(401).json({ error: 'You are not allowed to do this' });
         return;
     }

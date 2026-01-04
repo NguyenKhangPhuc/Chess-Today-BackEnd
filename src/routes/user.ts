@@ -163,7 +163,7 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
 // Route to update the user elo based on the gameType
 userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unknown, { gameId: string, gameType: GAME_TYPE, userElo: number, opponentId: string, opponentElo: number }>, res: Response) => {
     const { gameId, gameType, userElo, opponentId, opponentElo } = req.body;
-    if (!gameId || gameType || !userElo || opponentId || opponentElo) {
+    if (!gameId || !gameType || !userElo || !opponentId || !opponentElo) {
         res.status(400).json({ error: 'Invalid payload' });
         return;
     }
