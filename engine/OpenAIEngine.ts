@@ -24,7 +24,7 @@ Look at the FEN carefully, understand the board. Limit the inaccuracy of the ans
 
 Classify the move into one of the following categories (from best to worst): Brilliant, Great, Best, Excellent, Good, Book, Inaccuracy, Mistake, Miss, Blunder.
 
-Give a short explanation (only 1–2 short sentences, no long sentences) about why it fits that category.
+Give a short explanation (only 1–2 short sentences, no long sentences) about why it fits that category. Do not add score to the explanation
 
 Always return the answer in this format:
 

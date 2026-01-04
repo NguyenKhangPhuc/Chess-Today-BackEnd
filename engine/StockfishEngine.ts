@@ -1,12 +1,13 @@
 import { spawn } from 'child_process';
 import { EngineScore } from '../src/types/types';
-
+import os from 'os';
 export class StockfishEngine {
     private process;
 
-    constructor(path = './engines/stockfish/stockfish-windows-x86-64-avx2.exe') {
+    constructor(path = os.platform() === 'win32' ? './engines/stockfish/stockfish-windows-x86-64-avx2.exe' :
+        './engines/stockfish-linux/stockfish/stockfish-ubuntu-x86-64-avx2') {
         this.process = spawn(path); // chạy file .exe hoặc binary
-
+        console.log(os.platform());
         this.process.stderr.on('data', (data) => {
             console.error(`Lỗi Stockfish: ${data}`);
         });
