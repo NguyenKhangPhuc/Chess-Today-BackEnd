@@ -279,4 +279,55 @@ gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id:
 
 });
 
+gameRouter.put('/fen/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, { fen: string }>, res: Response) => {
+    // Check the params id
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
+    // Check the payload
+    const { fen } = req.body;
+    if (!fen) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
+    // Find the game based on its id
+    const game = await Game.findByPk(id, {
+        include: [
+            {
+                model: Move,
+                as: 'moveHistory'
+            },
+            {
+                model: models.User,
+                as: 'player1',
+                attributes: { exclude: ['password'] }
+            },
+            {
+                model: models.User,
+                as: 'player2',
+                attributes: { exclude: ['password'] }
+            }
+        ]
+    });
+    if (!game) {
+        res.status(401).json({ error: 'Game not found' });
+        return;
+    }
+    // Check if the verified user is the player of the game
+    if (req.user!.id != game.player1Id && req.user!.id != game.player2Id) {
+        res.status(401).json({ error: 'You are not allowed to use this api' });
+        return;
+    }
+    // update the game fen
+    await game.update({
+        fen: fen
+    });
+
+    res.status(200).json(game);
+    return;
+});
+
+
 export default gameRouter;

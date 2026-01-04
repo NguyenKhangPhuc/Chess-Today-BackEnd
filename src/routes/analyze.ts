@@ -53,7 +53,7 @@ analyzeRouter.post('/explanation', tokenExtractor, async (req: Request<unknown, 
     // Find the game by its id
     const { move, beforeFen, senderId, gameId } = req.body ?? {};
     let score = req.body.score;
-    if (!move || !beforeFen || !score || !senderId || !gameId) {
+    if (!move || !beforeFen || !senderId || !gameId) {
         res.status(400).json({ error: 'Invalid payload' });
         return;
     }
