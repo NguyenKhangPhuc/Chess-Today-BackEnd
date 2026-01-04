@@ -7,7 +7,10 @@ const messageRouter = express.Router();
 
 // Route to create the message with other users
 messageRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MessageAttributes>, res: Response) => {
-
+    if (!req.body) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Check if the people who create the message must be either sender or receiver
     if (req.user!.id != req.body.senderId && req.user!.id != req.body.receiverId) {
         res.status(401).json({ error: 'You are not allowed to do this' });

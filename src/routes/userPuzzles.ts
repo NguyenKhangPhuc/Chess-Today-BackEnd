@@ -19,6 +19,11 @@ userPuzzlesRouter.get('/userId', tokenExtractor, async (req: Request, res: Respo
 
 // Route to create a user-puzzle relation (meaning that the user has solved the puzzle)
 userPuzzlesRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, { puzzleId: string, userId: string }>, res: Response) => {
+    const { puzzleId, userId } = req.body;
+    if (!puzzleId || !userId) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Create a puzzle object to be inserted to the user_puzzles table
     const userPuzzle: UserPuzzleRelationAttribute = {
         puzzleId: req.body.puzzleId,

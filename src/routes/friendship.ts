@@ -11,6 +11,10 @@ const friendshipRouter = express.Router();
 
 // Get the relationship of the verified user.
 friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+    }
     // Get the query params from the front-end including cursor after - before and limit to take
     const { after, before, limit } = req.query;
     let where = {};
@@ -22,8 +26,8 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
             [Op.and]: [
                 {
                     [Op.or]: [
-                        { userId: req.params.id },
-                        { friendId: req.params.id },
+                        { userId: id },
+                        { friendId: id },
                     ]
                 },
                 { createdAt: { [Op.lt]: after } }
@@ -39,8 +43,8 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
             [Op.and]: [
                 {
                     [Op.or]: [
-                        { userId: req.params.id },
-                        { friendId: req.params.id },
+                        { userId: id },
+                        { friendId: id },
                     ]
                 },
                 { createdAt: { [Op.gt]: before } }
@@ -56,8 +60,8 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
     const response = await FriendShip.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
             [Op.or]: [
-                { userId: req.params?.id },
-                { friendId: req.params?.id },
+                { userId: id },
+                { friendId: id },
             ]
         },
         order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
@@ -88,6 +92,10 @@ friendshipRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: stri
 
 // Route to create friendship relation with other person
 friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, FriendAttributes>, res: Response) => {
+    if (req.body) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Get the id from the other person from request body
     const { friendId } = req.body;
     // Create the friendship
@@ -103,8 +111,13 @@ friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown,
 
 // Route to delete the friendship relation with other person
 friendshipRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     // Find the friendship by its id from the request params
-    const response = await models.FriendShip.findByPk(req.params.id);
+    const response = await models.FriendShip.findByPk(id);
     if (!response) {
         res.status(401).json({ error: 'Friendship not found' });
         return;

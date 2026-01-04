@@ -9,7 +9,11 @@ const verificationRouter = express.Router();
 // Route to create a verification code and send mail to user
 verificationRouter.post('/', async (req: Request<unknown, unknown, { username: string, type: VERIFICATION_TYPE }>, res: Response) => {
     // Find the user, if exists -> create the random 6 number code and send to the user email
-    console.log(req.body);
+    const { username, type } = req.body;
+    if (!username || !type) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     const foundUser = await User.findOne({ where: { username: req.body.username } });
     if (!foundUser) {
         res.status(400).json({ error: 'Incorrect Username' });

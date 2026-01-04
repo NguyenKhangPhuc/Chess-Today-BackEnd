@@ -52,7 +52,7 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
         where = {
             [Op.and]: [
                 { createdAt: { [Op.lt]: after }, },
-                { id: { [Op.notIn]: [...excludeIds] } },
+                { id: { [Op.notIn]: [...excludeIds, req.user!.id] } },
                 { isBot: false }
             ]
         };
@@ -64,7 +64,7 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
         where = {
             [Op.and]: [
                 { createdAt: { [Op.gt]: before }, },
-                { id: { [Op.notIn]: [...excludeIds] } },
+                { id: { [Op.notIn]: [...excludeIds, req.user!.id] } },
                 { isBot: false }
             ]
         };
@@ -75,7 +75,7 @@ userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) =>
     // Else -> get data from oldest to newest
     const response = await models.User.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
-            id: { [Op.notIn]: [...excludeIds] },
+            id: { [Op.notIn]: [...excludeIds, req.user!.id] },
             isBot: false
         },
         order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
@@ -125,9 +125,14 @@ userRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
 
 // Route to get the information of the specific user information based on their id through request params
 userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
-    console.log(req.params.id, "Params id");
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
+    console.log(id, "Params id");
     // Get the specific user information through the req params, including the friends
-    const response = await models.User.findByPk(req.params?.id, {
+    const response = await models.User.findByPk(id, {
         attributes: { exclude: ['password'] },
         include: [
 
@@ -159,21 +164,26 @@ userRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unkno
 
 // Route to update the user elo based on the gameType
 userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unknown, { gameId: string, gameType: GAME_TYPE, userElo: number, opponentId: string, opponentElo: number }>, res: Response) => {
+    const { gameId, gameType, userElo, opponentId, opponentElo } = req.body;
+    if (!gameId || gameType || !userElo || opponentId || opponentElo) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Find the game and check its status
     console.log("Update userElo", req.body);
-    const game = await Game.findByPk(req.body.gameId);
+    const game = await Game.findByPk(gameId);
     if (!game) {
         res.status(500).json({ error: 'Internal server error' });
         return;
     }
 
     if (game.gameStatus == GAME_STATUS.FINISHED) {
-        res.status(409).json({ error: 'Game is already been updated' });
+        res.status(200).json({ message: 'Game is already been updated' });
         return;
     }
     // Find the user based on the id from the decoded token
     const user = await User.findByPk(req.user!.id);
-    const opponent = await User.findByPk(req.body.opponentId);
+    const opponent = await User.findByPk(opponentId);
     if (!user || !opponent) {
         res.status(401).json({ error: 'User not found' });
         return;
@@ -185,7 +195,7 @@ userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unkno
         [GAME_TYPE.RAPID]: 'elo',
     };
     // Get the suitable field from the gameType
-    const fieldToUpdate = fieldMap[req.body.gameType];
+    const fieldToUpdate = fieldMap[gameType];
     if (!fieldToUpdate) {
         // Return if field is inccorect
         res.status(400).json({ error: 'Game type incorrect' });
@@ -194,9 +204,9 @@ userRouter.put('/update-elo', tokenExtractor, async (req: Request<unknown, unkno
     // Update the suitable field above
     console.log('Update userElo');
     const response = await user.update({
-        [fieldToUpdate]: req.body.userElo
+        [fieldToUpdate]: userElo
     });
-    const opponentResponse = await opponent.update({ [fieldToUpdate]: req.body.opponentElo });
+    const opponentResponse = await opponent.update({ [fieldToUpdate]: opponentElo });
     if (!response || !opponentResponse) {
         res.status(500).json({ error: 'Internal server error' });
         return;

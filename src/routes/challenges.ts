@@ -24,6 +24,10 @@ challengeRouter.get('/', tokenExtractor, async (req: Request, res: Response) => 
 // Route to get a specific challenge
 challengeRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
     // Find the challenge by id
+    if (!req.params.id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     const response = await Challenge.findByPk(req.params.id);
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -35,9 +39,12 @@ challengeRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }, 
 
 // Route to create the challenge
 challengeRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, { challenge: ChallengeAttributes }>, res: Response) => {
+    const { challenge } = req.body;
+    if (!challenge) {
+        res.status(400).json({ error: 'Invalid payload' });
+    }
     // Create the challenge with the given info in the request body.
-    console.log(req.body.challenge);
-    const response = await Challenge.create(req.body.challenge);
+    const response = await Challenge.create(challenge);
     const challengeWithUser = await Challenge.findByPk(response.id, {
         include: [
             {

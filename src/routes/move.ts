@@ -8,8 +8,13 @@ const moveRouter = express.Router();
 
 // Route to create the move in game
 moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveAttributes>, res: Response) => {
+    const move = req.body;
+    if (!move) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Find the gameId and check if it exists
-    const game = await Game.findByPk(req.body.gameId);
+    const game = await Game.findByPk(move.gameId);
     if (!game) {
         res.status(401).json({ error: 'Game not found' });
         return;
@@ -19,7 +24,6 @@ moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveA
         res.status(401).json({ error: 'You are not allowed to use this api' });
         return;
     }
-    const move = req.body;
     // Create the move
     const response = await Move.create(move);
     if (!response) {
@@ -32,11 +36,15 @@ moveRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, MoveA
 
 // Route to find all move of a specific game
 moveRouter.get('/game/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     // Find all the move with the given gameId
-    console.log(req.params.id, "Games move");
     const response = await Move.findAll({
         where: {
-            gameId: req.params.id
+            gameId: id
         },
         order: [['createdAt', 'ASC']],
         include: [

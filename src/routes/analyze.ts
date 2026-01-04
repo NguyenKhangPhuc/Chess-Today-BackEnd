@@ -11,9 +11,13 @@ const analyzeRouter = express.Router();
 // Route to get the move from Stockfish engine
 analyzeRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, { fen: string, gameId: string }>, res: Response) => {
 
-
+    const { fen, gameId } = req.body ?? {};
+    if (!fen || !gameId) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Find the game by its id
-    const response = await Game.findByPk(req.body.gameId);
+    const response = await Game.findByPk(gameId);
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
@@ -24,7 +28,6 @@ analyzeRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, { 
         return;
     }
     // Get the fen from the front-end
-    const fen = req.body.fen;
 
     if (!fen) {
         res.status(401).json({ error: 'FEN is required' });
@@ -48,7 +51,13 @@ analyzeRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, { 
 // Route to analyze the score of the move from the user
 analyzeRouter.post('/explanation', tokenExtractor, async (req: Request<unknown, unknown, { move: string, beforeFen: string, score: EngineScore | null, senderId: string, gameId: string }>, res: Response) => {
     // Find the game by its id
-    const foundGame = await Game.findByPk(req.body.gameId);
+    const { move, beforeFen, senderId, gameId } = req.body ?? {};
+    let score = req.body.score;
+    if (!move || !beforeFen || !score || !senderId || !gameId) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
+    const foundGame = await Game.findByPk(gameId);
     if (!foundGame) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
@@ -59,14 +68,13 @@ analyzeRouter.post('/explanation', tokenExtractor, async (req: Request<unknown, 
         return;
     }
 
-    let score = req.body.score;
     // Get the score from the body;
-    console.log('This is game Id and sender Id', req.body.gameId, req.body.senderId);
+    console.log('This is game Id and sender Id', gameId, senderId);
     if (!score) {
         // If the score is null -> initialize the stockfish engine
         const engine = new StockfishEngine();
         // Analyze the move from the front-end with fen value before moving, get the score
-        const { score: receivedScore } = await engine.evaluateMoveScore(req.body.beforeFen, req.body.move);
+        const { score: receivedScore } = await engine.evaluateMoveScore(beforeFen, move);
         if (!receivedScore) {
             // If the response is null -> error
             res.status(500).json({ error: 'Internal Server Error' });
@@ -77,7 +85,7 @@ analyzeRouter.post('/explanation', tokenExtractor, async (req: Request<unknown, 
     }
 
     // Call the OpenAI engine method to analyze the move above with the given information: move, fen, score.
-    const response = await openAIEngine.explainMove({ bestMove: req.body.move, fen: req.body.beforeFen, score: score });
+    const response = await openAIEngine.explainMove({ bestMove: move, fen: beforeFen, score: score });
     // If the explanation is empty or null -> error
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -86,8 +94,8 @@ analyzeRouter.post('/explanation', tokenExtractor, async (req: Request<unknown, 
 
     // Create the object with explanation and its owner.
     const gameMessage = {
-        senderId: req.body.senderId,
-        gameId: req.body.gameId,
+        senderId: senderId,
+        gameId: gameId,
         content: response
     };
     // Store the explanation to database and return it.

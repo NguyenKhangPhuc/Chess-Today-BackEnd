@@ -11,6 +11,10 @@ const loginRouter = express.Router();
 loginRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res: Response) => {
     // Get the user from the req body
     const receivedUser = req.body;
+    if (!receivedUser) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // No password -> error
     if (!receivedUser.password) {
         res.status(500).json({ error: 'Internal Server Error' });

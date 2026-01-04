@@ -122,11 +122,15 @@ inviteRouter.get('/receiver/user', tokenExtractor, async (req: Request, res: Res
 // Router to create the invitation
 inviteRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, InvitationAttributes>, res: Response) => {
     const { receiverId } = req.body;
+    if (!receiverId) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     const senderId = req.user!.id;
     // userA and userB col in invitation table are indexes, it is used to prevent duplicate invitation from users to users
     // We will normalize the senderId and receiverId by using comparison operation
     const [userA, userB] =
-        senderId < receiverId!
+        senderId < receiverId
             ? [senderId, receiverId]
             : [receiverId, senderId];
     // If userA or userB == null -> error
@@ -146,8 +150,13 @@ inviteRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, Inv
 
 // Route to delete the invitation
 inviteRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string }, unknown, unknown>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     // Find the invitation based on the id
-    const response = await Invitation.findByPk(req.params.id);
+    const response = await Invitation.findByPk(id);
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;

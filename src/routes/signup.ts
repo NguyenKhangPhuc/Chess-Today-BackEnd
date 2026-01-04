@@ -11,6 +11,10 @@ const signUpRouter = express.Router();
 signUpRouter.post('/', async (req: Request<unknown, unknown, UserAttributes>, res: Response) => {
     // Get the user
     const newUser = req.body;
+    if (!newUser) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Check the password if it exists
     if (newUser.password && newUser.password.length > 8 && newUser.password.length < 16) {
         // If yes -> hash the password

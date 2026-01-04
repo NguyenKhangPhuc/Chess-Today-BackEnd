@@ -13,8 +13,12 @@ const gameRouter = express.Router();
 
 // Route to create a new game base on the given info from the request
 gameRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, GameAttributes>, res: Response) => {
-    // Get the game info from the request body
     const game = req.body;
+    if (!game) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
+    // Get the game info from the request body
     // Create the game
     const response = await Game.create(game);
     if (!response) {
@@ -27,6 +31,11 @@ gameRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, GameA
 
 // Route to create a game with a bot
 gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { type: string }>, res: Response) => {
+    const { type } = req.body;
+    if (!type) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Find the bot user in the users table
     const bot = await User.findOne({
         where: {
@@ -41,7 +50,7 @@ gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { 
     }
     // Create a game with the bot and the user
     const response = await Game.create(
-        { player1Id: req.body.type === 'white' ? req.user!.id : bot.id, player2Id: req.body.type === 'white' ? bot.id : req.user!.id, isBotGame: true }
+        { player1Id: type === 'white' ? req.user!.id : bot.id, player2Id: type === 'white' ? bot.id : req.user!.id, isBotGame: true }
     );
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
@@ -54,6 +63,11 @@ gameRouter.post('/bot', tokenExtractor, async (req: Request<unknown, unknown, { 
 
 // Get all the games of the verified user
 gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     // Get the query params from the front-end including cursor after - before and limit to take
     const { after, before, limit } = req.query;
     if (!limit) {
@@ -69,8 +83,8 @@ gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>,
             [Op.and]: [
                 {
                     [Op.or]: [
-                        { player1Id: req.params?.id },
-                        { player2Id: req.params?.id }
+                        { player1Id: id },
+                        { player2Id: id }
                     ]
                 },
                 { createdAt: { [Op.lt]: after } }
@@ -85,8 +99,8 @@ gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>,
             [Op.and]: [
                 {
                     [Op.or]: [
-                        { player1Id: req.params?.id },
-                        { player2Id: req.params?.id }
+                        { player1Id: id },
+                        { player2Id: id }
                     ]
                 },
                 { createdAt: { [Op.gt]: before } }
@@ -101,8 +115,8 @@ gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>,
     const response = await Game.findAll({
         where: Object.getOwnPropertySymbols(where).length > 0 ? where : {
             [Op.or]: [
-                { player1Id: req.params?.id },
-                { player2Id: req.params?.id }
+                { player1Id: id },
+                { player2Id: id }
             ]
         },
         order: (!after && !before) || after ? [['createdAt', 'DESC']] : [['createdAt', 'ASC']],
@@ -138,8 +152,13 @@ gameRouter.get('/user/:id', tokenExtractor, async (req: Request<{ id: string }>,
 
 // Route to get a specific game
 gameRouter.get('/:id', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     // Find a specific game based on its Id
-    const response = await Game.findByPk(req.params.id, {
+    const response = await Game.findByPk(id, {
         include: [
             {
                 model: Move,
@@ -190,8 +209,13 @@ gameRouter.post('/check-ongoing-game', tokenExtractor, async (req: Request, res:
 
 // Route to update the game result and game status
 gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
     // Find the game based on its id
-    const game = await Game.findByPk(req.params.id);
+    const game = await Game.findByPk(id);
     if (!game) {
         res.status(401).json({ error: 'Game not found' });
         return;
@@ -218,8 +242,18 @@ gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>,
 
 // Route to update the game result and game status
 gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id: string }, unknown, { winnerId: string, loserId: string }>, res: Response) => {
+    const { id } = req.params;
+    if (!id) {
+        res.status(400).json({ error: 'Invalid id' });
+        return;
+    }
+    const { winnerId, loserId } = req.body;
+    if (!winnerId || !loserId) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // Find the game based on its id
-    const game = await Game.findByPk(req.params.id);
+    const game = await Game.findByPk(id);
     if (!game) {
         res.status(401).json({ error: 'Game not found' });
         return;

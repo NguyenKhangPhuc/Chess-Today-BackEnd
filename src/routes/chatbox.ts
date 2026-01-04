@@ -46,7 +46,10 @@ chatBoxRouter.get('/', tokenExtractor, async (req: Request, res: Response) => {
 
 // Route to create a chatbox
 chatBoxRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown, ChatBoxAttributes>, res: Response) => {
-
+    if (!req.body) {
+        res.status(400).json({ error: 'Invalid payload' });
+        return;
+    }
     // userA and userB are the indexes of the chatbox tables, normalize them before create
     // so that we can avoid duplicate chatbox of the same user.
     const [userA, userB] =
