@@ -98,7 +98,8 @@ friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown,
     // Get the id from the other person from request body
     const { friendId } = req.body;
     // Create the friendship
-    const response = await models.FriendShip.create({ userId: req.user!.id, friendId });
+    const [userA, userB] = req.user!.id < friendId ? [req.user!.id, friendId] : [friendId, req.user!.id];
+    const response = await models.FriendShip.create({ userId: req.user!.id, friendId, userA, userB });
     if (!response) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;

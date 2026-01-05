@@ -10,12 +10,21 @@ class FriendShip extends Model<FriendAttributes, FriendShipCreationAttributes> i
     friendId!: string;
     createdAt?: string;
     updatedAt?: string;
+    userA!: string;
+    userB!: string;
 }
 FriendShip.init({
     id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true },
     userId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
     friendId: { type: DataTypes.UUID, references: { model: 'users', key: 'id' }, allowNull: false },
-
+    userA: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
+    userB: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
 }, {
     sequelize,
     underscored: true,

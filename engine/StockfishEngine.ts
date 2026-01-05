@@ -14,6 +14,7 @@ export class StockfishEngine {
     }
 
     parseScore(line: string): EngineScore | null {
+        // Get the score type and the score value
         const mate = line.match(/\bscore\s+mate\s+(-?\d+)/);
         if (mate) return { type: "mate", value: parseInt(mate[1], 10) };
         const cp = line.match(/\bscore\s+cp\s+(-?\d+)/);
@@ -30,16 +31,17 @@ export class StockfishEngine {
         return new Promise((resolve) => {
             let bestMove = '';
             let score: EngineScore | null;
-
+            // Send command for stockfish to analyze
             this.sendCommand(`uci`);
             this.sendCommand(`ucinewgame`);
             this.sendCommand(`position fen ${fen}`);
             this.sendCommand(`go depth ${depth}`);
 
-            // Đọc đầu ra của Stockfish
+            // Read the output of stockfish
             this.process.stdout.on('data', (data: Buffer) => {
                 const lines = data.toString().split('\n');
                 for (const line of lines) {
+                    // Get the best moves and normalize the score
                     if (line.startsWith('info')) {
                         score = this.parseScore(line);
                     }

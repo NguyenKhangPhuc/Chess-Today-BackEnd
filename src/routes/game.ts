@@ -7,7 +7,7 @@ import { Op } from 'sequelize';
 import { PaginationCursor } from '../helpers/pagination';
 import User from '../models/user';
 import { GameAttributes } from '../types/game';
-import { GAME_STATUS } from '../types/enum';
+import { GAME_STATUS, GAME_TYPE } from '../types/enum';
 
 const gameRouter = express.Router();
 
@@ -241,14 +241,14 @@ gameRouter.put('/:id/draw', tokenExtractor, async (req: Request<{ id: string }>,
 });
 
 // Route to update the game result and game status
-gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id: string }, unknown, { winnerId: string, loserId: string }>, res: Response) => {
+gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id: string }, unknown, { winnerId: string, loserId: string, gameType: GAME_TYPE }>, res: Response) => {
     const { id } = req.params;
     if (!id) {
         res.status(400).json({ error: 'Invalid id' });
         return;
     }
-    const { winnerId, loserId } = req.body;
-    if (!winnerId || !loserId) {
+    const { winnerId, loserId, gameType } = req.body;
+    if (!winnerId || !loserId || !gameType) {
         res.status(400).json({ error: 'Invalid payload' });
         return;
     }
@@ -269,12 +269,50 @@ gameRouter.put('/:id/specific-result', tokenExtractor, async (req: Request<{ id:
         return;
     }
     // Update the game result, the winner, the loser and the game status
-    const response = await game.update({ winnerId: req.body.winnerId, loserId: req.body.loserId, gameStatus: GAME_STATUS.FINISHED });
-    if (!response) {
+    const gameUpdation = await game.update({ winnerId: req.body.winnerId, loserId: req.body.loserId, gameStatus: GAME_STATUS.FINISHED });
+
+    // Return soon if it is a bot game
+    if (game.isBotGame) {
+        res.status(200).json({ message: 'Update successfully' });
+        return;
+    }
+
+    if (!gameUpdation) {
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
-    res.status(200).json(response);
+
+    const winner = await User.findByPk(winnerId);
+    const loser = await User.findByPk(loserId);
+    if (!winner || !loser) {
+        res.status(401).json({ error: 'User not found' });
+        return;
+    }
+    // Map to map the gameType to the user field
+    const fieldMap: Record<GAME_TYPE, keyof User> = {
+        [GAME_TYPE.ROCKET]: 'rocketElo',
+        [GAME_TYPE.BLITZ]: 'blitzElo',
+        [GAME_TYPE.RAPID]: 'elo',
+    };
+    // Get the suitable field from the gameType
+    const fieldToUpdate = fieldMap[gameType];
+    if (!fieldToUpdate) {
+        // Return if field is inccorect
+        res.status(400).json({ error: 'Game type incorrect' });
+        return;
+    }
+    // Update the suitable field above
+    const winnerElo = winner[fieldToUpdate] as number + 8;
+    const loserElo = loser[fieldToUpdate] as number - 8;
+    const response = await winner.update({
+        [fieldToUpdate]: winnerElo
+    });
+    const opponentResponse = await loser.update({ [fieldToUpdate]: loserElo });
+    if (!response || !opponentResponse) {
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+    }
+    res.status(200).json({ message: 'Update successfully' });
     return;
 
 });

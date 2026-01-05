@@ -5,4 +5,6 @@ export interface FriendAttributes {
     friendId: string,
     createdAt?: string,
     updatedAt?: string,
+    userA: string;
+    userB: string;
 }
