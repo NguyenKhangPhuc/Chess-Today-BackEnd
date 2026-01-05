@@ -65,7 +65,6 @@ start().then(() => { }).catch(() => console.log('Cannot connect to DB and run Mi
 
 
 app.get('/ping', (_req, res) => {
-    console.log('someone pinged here');
     res.send('pong');
 });
 

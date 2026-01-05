@@ -33,8 +33,14 @@ export function registerChallengeHandlers(io: Server, socket: Socket) {
                 const player1SocketId = onlineUsers.getSocketId(whitePlayerId)!;
                 const player2SocketId = onlineUsers.getSocketId(blackPlayerId)!;
                 challengePageController.deletePage(challenge.id!);
-                if (!player1SocketId || !player2SocketId) {
+                if (!player1SocketId) {
                     console.log('Error: User out page');
+                    challengePageController.deleteUserFromPage(challenge.id!, whitePlayerId);
+                    return;
+                }
+                if (!player2SocketId) {
+                    console.log('Error: User out page');
+                    challengePageController.deleteUserFromPage(challenge.id!, blackPlayerId);
                     return;
                 }
                 // Create the match and emit to both users

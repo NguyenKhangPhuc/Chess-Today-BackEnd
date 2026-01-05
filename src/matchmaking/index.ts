@@ -70,7 +70,11 @@ class MatchMakingQueue {
         // Get the user elo base on the gameType
         const playerElo = this.getCorrectElo(player, gameType);
         // Calculate the min max elo (range of the elo to be checked)
-        if (!playerElo) return;
+        if (!playerElo) {
+            console.log('Error type not match');
+            this.remove(player.id);
+            return;
+        };
         const minElo = playerElo - delta;
         const maxElo = playerElo + delta;
         // Using binary search to search the index of the user base on elo
@@ -82,6 +86,8 @@ class MatchMakingQueue {
             const foundedPlayerElo = this.getCorrectElo(this.playerQueue[mid], gameType);
             if (!foundedPlayerElo) {
                 console.log('Error type not match');
+                this.remove(player.id);
+                this.remove(this.playerQueue[mid].id);
                 return;
             }
             if (foundedPlayerElo < minElo) {
@@ -99,16 +105,16 @@ class MatchMakingQueue {
         for (let i = startIndex; i < this.playerQueue.length && this.playerQueue[i].time === player.time; i++) {
             // Get the current index player elo base on the gameType
             const foundedPlayerElo = this.getCorrectElo(this.playerQueue[i], gameType);
-            // If elo null -> error
+            // If the playerInQueue is the user -> skip it
+            const playerInQueue = this.playerQueue[i];
+            if (playerInQueue.id === player.id) continue;// If elo null -> error
             if (!foundedPlayerElo) {
-                console.log('Error type not match');
+                this.remove(player.id);
+                this.remove(playerInQueue.id);
                 return;
             }
             // If elo > maxElo -> out of range -> return
             if (foundedPlayerElo > maxElo) break;
-            // If the playerInQueue is the user -> skip it
-            const playerInQueue = this.playerQueue[i];
-            if (playerInQueue.id === player.id) continue;
             // If not start to calculate the waitingTime
             const waitingTime = Date.now() - joinAt;
             // Calculate the eloDiff

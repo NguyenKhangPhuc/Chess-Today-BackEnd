@@ -15,7 +15,7 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
         }
         // Get the opponent and user socketId
         const opponentSocketId = onlineUsers.getSocketId(opponentId);
-
+        const userSocketId = onlineUsers.getSocketId(socket.user.id);
         // Find the game by its id
         const game = await Game.findByPk(roomId);
 
@@ -35,9 +35,14 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
                 // Create the new move
                 await Move.create(newMove);
                 // Get the newly returned value from the game
+
                 // Emit to both the player
                 if (opponentSocketId) {
                     gameEmitter.emitBoardStateChange(io, rows[0].toJSON(), opponentSocketId);
+                }
+
+                if (userSocketId) {
+                    gameEmitter.emitMoveSuccessfully(io, userSocketId);
                 }
 
             } else {
@@ -46,13 +51,17 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
                 // Create the new move
                 await Move.create(newMove);
                 // Get the newly returned value from the game
+
                 // Emit to both the player
                 if (opponentSocketId) {
                     gameEmitter.emitBoardStateChange(io, rows[0].toJSON(), opponentSocketId);
                 }
+                if (userSocketId) {
+                    gameEmitter.emitMoveSuccessfully(io, userSocketId);
+                }
             }
         } catch (error) {
-            socket.emit('socket_error', { error, listener: 'board_state_change' });
+            socket.emit('socket_error', { error: error, listener: 'board_state_change' });
             return;
         }
     });

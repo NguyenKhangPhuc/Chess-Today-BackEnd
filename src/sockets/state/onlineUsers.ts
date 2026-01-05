@@ -1,5 +1,5 @@
 class OnlineUsers {
-    private userToSockets = new Map<string, string>();
+    public userToSockets = new Map<string, string>();
     // To add the user to the online users map
     add(userId: string, socketId: string) {
         if (!this.userToSockets.has(userId)) {

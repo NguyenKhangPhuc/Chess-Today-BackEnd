@@ -8,17 +8,22 @@ class MessageEmitter {
     emitNewMessage(io: Server, sender: TokenAttributes, receiverId: string, chatBox: ChatBoxAttributes | null) {
         const userSocketId = onlineUsers.getSocketId(sender.id);
         const opponentSocketId = onlineUsers.getSocketId(receiverId);
-        if (!userSocketId) {
+        if (userSocketId) {
+            io.to(userSocketId).emit('new_message', chatBox);
             console.log('Missing user id');
-            return;
+
+        } else {
+            console.log('Missing user id');
         }
-        io.to(userSocketId).emit('new_message', chatBox);
-        if (!opponentSocketId) {
+
+        if (opponentSocketId) {
+            io.to(opponentSocketId).emit('new_messages_outside', sender);
+            io.to(opponentSocketId).emit('new_message', chatBox);
+
+        } else {
             console.log('Missing opponentSocketId');
-            return;
         }
-        io.to(opponentSocketId).emit('new_messages_outside', sender);
-        io.to(opponentSocketId).emit('new_message', chatBox);
+
     }
 }
 

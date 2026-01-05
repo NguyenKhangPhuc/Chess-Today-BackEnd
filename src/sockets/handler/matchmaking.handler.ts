@@ -14,7 +14,6 @@ export function registerMatchMakingHandlers(io: Server, socket: Socket) {
             socket.emit('socket_error', { error: 'Not authenticated', listener: 'join_queue' });
             return;
         }
-
         // Find the other best match player
         const bestMatch = await gameQueue.matchMaking(player, timeSetting.mode);
         // If there exists -> create the match and emit it to both user

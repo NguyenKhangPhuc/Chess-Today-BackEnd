@@ -19,19 +19,21 @@ export function registerMessageHandlers(io: Server, socket: Socket) {
             // Get the user1 and user2 socket id
             const userSocketId = onlineUsers.getSocketId(socket.user.id);
             const opponentSocketId = onlineUsers.getSocketId(message.receiverId);
-            if (!userSocketId) {
+            if (userSocketId) {
+                io.to(userSocketId).emit('new_message', chatBox);
+            } else {
                 console.log('Missing user id');
-                return;
             }
             // Announce to user1
-            io.to(userSocketId).emit('new_message', chatBox);
-            if (!opponentSocketId) {
+
+            if (opponentSocketId) {
+
+                io.to(opponentSocketId).emit('new_messages_outside', socket.user);
+                io.to(opponentSocketId).emit('new_message', chatBox);
+            } else {
                 console.log('Missing opponentSocketId');
-                return;
             }
             // Announce to user2
-            io.to(opponentSocketId).emit('new_messages_outside', socket.user);
-            io.to(opponentSocketId).emit('new_message', chatBox);
         } catch (error) {
             socket.emit('socket_error', { error, listener: 'board_state_change' });
             return;
