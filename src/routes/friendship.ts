@@ -104,7 +104,7 @@ friendshipRouter.post('/', tokenExtractor, async (req: Request<unknown, unknown,
         res.status(500).json({ error: 'Internal Server Error' });
         return;
     }
-    res.status(200).json(response);
+    res.status(200).json({ receiver: req.user!, senderId: response.friendId });
     return;
 });
 
@@ -129,7 +129,7 @@ friendshipRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string
         return;
     }
     await response.destroy();
-    res.status(204).end();
+    res.status(200).json({ message: 'delete successfully', userDeletedId: response.userId == req.user!.id ? response.friendId : response.userId });
     return;
 });
 

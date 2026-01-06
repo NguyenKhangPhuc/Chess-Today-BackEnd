@@ -165,7 +165,7 @@ inviteRouter.delete('/:id', tokenExtractor, async (req: Request<{ id: string }, 
     }
     // Delete it
     await response.destroy();
-    res.status(204).end();
+    res.status(200).json({ userDelete: req.user, userReceiveId: req.user!.id != response.senderId ? response.senderId : response.receiverId });
     return;
 });
 

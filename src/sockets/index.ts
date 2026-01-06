@@ -8,6 +8,7 @@ import { registerInGameHandlers } from "./handler/game.handler";
 import { registerInvitationHandler } from "./handler/invitation.handler";
 import { registerMessageHandlers } from "./handler/message.handler";
 import { registerChallengeHandlers } from "./handler/challenge.handler";
+import { registerFriendShipHandler } from "./handler/friendship.handler";
 
 
 declare module "socket.io" {
@@ -30,5 +31,7 @@ export const setUpSocket = (io: Server) => {
         registerMessageHandlers(io, socket);
         // Register the challenge handler
         registerChallengeHandlers(io, socket);
+        // Register the friendship handler
+        registerFriendShipHandler(io, socket);
     });
 };
