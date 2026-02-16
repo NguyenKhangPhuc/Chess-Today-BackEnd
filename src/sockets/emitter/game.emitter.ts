@@ -6,8 +6,8 @@ class GameEmitter {
         io.to(opponentSocketId).emit('board_state_change', game);
     }
 
-    emitMoveSuccessfully(io: Server, userSocketid: string) {
-        io.to(userSocketid).emit('move_successfully', 'Move successfully');
+    emitMoveSuccessfully(io: Server, game: GameAttributes, userSocketid: string) {
+        io.to(userSocketid).emit('move_successfully', game);
     }
 }
 

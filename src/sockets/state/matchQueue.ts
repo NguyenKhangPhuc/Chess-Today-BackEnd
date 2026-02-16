@@ -19,7 +19,8 @@ class MatchQueue {
             // add the player to the queue
             correctQueue.add(player, gameType);
             // finding the best match 
-            bestMatch = correctQueue.findMatch(player, gameType, 100);
+            console.log(correctQueue);
+            bestMatch = correctQueue.findMatch(player, gameType, 150);
 
             if (bestMatch) {
                 // If exists bestmatch, remove both from the queue
