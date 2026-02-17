@@ -89,6 +89,7 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
         if (opponentSocketId) {
             io.to(opponentSocketId).emit('announce_game_finished', 'Game finished');
         }
+        socket.broadcast.emit('leaderboard', { message: 'LeaderBoard updation' });
     });
 
     // To announce new in-game message

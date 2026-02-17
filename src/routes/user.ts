@@ -23,6 +23,22 @@ userRouter.get('/check', tokenExtractor, (req: Request, res: Response) => {
     return;
 });
 
+
+// Route to get all the user but not the bot
+userRouter.get('/all-users', tokenExtractor, async (_: Request, res: Response) => {
+    const users = await User.findAll({
+        where: { isBot: false },
+        attributes: { exclude: ['password'] },
+    });
+
+    if (!users) {
+        res.status(500).json({ error: 'Internal server error' });
+        return;
+    }
+
+    res.status(200).json(users);
+
+});
 // Route to get all the people who are not the verified user's friends
 userRouter.get('/people', tokenExtractor, async (req: Request, res: Response) => {
     // Find all the verified user's friends
