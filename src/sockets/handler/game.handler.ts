@@ -9,7 +9,6 @@ import { MoveAttributes } from "../../types/move";
 export function registerInGameHandlers(io: Server, socket: Socket) {
     // When the state of the chessboard change
     socket.on('board_state_change', async ({ opponentId, roomId, fen, newTimeLeft, newMove }: { opponentId: string, roomId: string, fen: string, newTimeLeft: number, newMove: MoveAttributes }) => {
-        console.log("Hit here");
         if (!socket.user) {
             console.log("Lỗi socket authenticated");
             socket.emit('socket_error', { error: 'Not authenticated', listener: 'board_state_change' });
@@ -33,7 +32,6 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
             return;
         };
         try {
-            console.log("Hit inside nè");
             if (socket.user.id === game.player1Id) {
                 // Update the game when the player1 move
                 const [_, rows] = await gameService.updatePlayerOneMove(newTimeLeft, roomId, fen);
@@ -74,7 +72,6 @@ export function registerInGameHandlers(io: Server, socket: Socket) {
     });
 
     socket.on('announce_game_finished', (opponentId: string) => {
-        console.log('See game finished');
         if (!socket.user) {
             console.log("Lỗi socket authenticated");
             socket.emit('socket_error', { error: 'Not authenticated', listener: 'board_state_change' });
