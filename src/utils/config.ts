@@ -9,6 +9,7 @@ const SMTP_HOST = process.env.SMTP_HOST ? process.env.SMTP_HOST : '';
 const SMTP_PORT = process.env.SMTP_PORT ? process.env.SMTP_PORT : '';
 const SMTP_USER = process.env.SMTP_USER ? process.env.SMTP_USER : '';
 const SMTP_PASS = process.env.SMTP_PASS ? process.env.SMTP_PASS : '';
+const RESEND_API_KEY = process.env.RESEND_API_KEY ? process.env.RESEND_API_KEY : '';
 const NODE_ENV = process.env.NODE_ENV ? process.env.NODE_ENV : 'development';
 export {
     PORT,
@@ -19,5 +20,6 @@ export {
     SMTP_PORT,
     SMTP_USER,
     SMTP_PASS,
-    NODE_ENV
+    NODE_ENV,
+    RESEND_API_KEY
 };
